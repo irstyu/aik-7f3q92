@@ -1,6 +1,6 @@
 // 配列データベース（ブラウザ内保存）。初期データ(arrays)は読み取り専用で、書き換えません。
 (function(){
-var KEY='aikatsu_db_v1',CERT={confirmed:'確認済み',estimated:'推定',unknown:'不明'},MARK={confirmed:'確',estimated:'推',unknown:'－'};
+var VER='3.1',KEY='aikatsu_db_v1',CERT={confirmed:'確認済み',estimated:'推定',unknown:'不明'},MARK={confirmed:'確',estimated:'推',unknown:'－'};
 var RAR=['','N','PR','ER','PAR'],SIDE={'':'未記録',left:'左',right:'右',unknown:'不明'};
 var db=load(),ed='1',arr='1',$=function(i){return document.getElementById(i)};
 function load(){try{var d=JSON.parse(localStorage.getItem(KEY));if(d&&d.slots){if(!d.seed1){Object.keys(d.slots).forEach(function(x){if(x.indexOf('1-')===0)delete d.slots[x]});d.seed1=true}if(d.editions&&d.editions['1'])d.editions['1'].locked=true;return d}}catch(e){}
@@ -10,7 +10,7 @@ function k(e,a,s){return e+'-'+a+'-'+s}
 function base(a,s){var b=(ed==='1'&&window.arrays&&arrays[a])?arrays[a][s-1]:null;return b}
 function eff(a,s){var r=db.slots[k(ed,a,s)],b=base(a,s);
  if(r)return{name:r.name||'',rarity:r.rarity||(b?b.rarity:''),cert:r.cert,src:'user',rec:r};
- if(b)return{name:b.options.length?b.options.map(function(o){return(o.star?'★':'')+o.id+':'+o.name}).join(' / '):'',rarity:b.rarity,cert:'confirmed',src:'base'};
+ if(b)return{ids:b.options.map(function(o){return o.id}),name:b.options.length?b.options.map(function(o){return(o.star?'★':'')+o.id+':'+o.name}).join(' / '):'',rarity:b.rarity,cert:'confirmed',src:'base'};
  return{name:'',rarity:'',cert:'unknown',src:'none'}}
 function esc(s){return String(s).replace(/[&<>"']/g,function(m){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]})}
 var css=document.createElement('style');css.textContent=
@@ -21,7 +21,7 @@ var css=document.createElement('style');css.textContent=
 '.dbsheet label{display:block;margin-top:8px;font-size:14px}.dbsheet input,.dbsheet select{width:100%;font-size:17px;padding:11px;border-radius:10px;border:1px solid var(--line)}.dbsheet .row{display:flex;gap:8px;margin-top:12px}.dbsheet .row button{flex:1;padding:14px;font-size:16px;border-radius:10px;border:0;background:var(--accent);color:#fff}.dbsheet .row .g{background:#e9ecf3;color:#333}.dbsheet .row .d{background:#d9534f}';
 document.head.appendChild(css);
 var v=document.createElement('section');v.id='dbView';v.className='view';
-v.innerHTML='<div class="arrayhead"><button class="back" id="dbBack">← 戻る</button><h2>配列データベース</h2></div><div class="dbbar"><select id="dbEd"></select><select id="dbArr"></select></div><div id="dbProg" class="dbprog"></div><div id="dbGrid" class="dbgrid"></div>'+
+v.innerHTML='<div class="arrayhead"><button class="back" id="dbBack">← 戻る</button><h2>配列データベース</h2></div><div class="dbbar"><select id="dbEd"></select><select id="dbArr"></select></div><div id="dbProg" class="dbprog"></div><div id="dbGrid" class="dbgrid"></div><div id="dbObs"></div>'+
 '<div class="dbbar" style="margin-top:14px"><button id="dbAddEd">＋新しい弾</button><button id="dbAddArr">＋新しい配列</button></div><div class="dbprog"><b>バックアップ</b><div id="dbBk"></div><div class="dbbar"><button id="dbExp"> 書き出し</button><button id="dbImp"> 復元（追加）</button></div><input type="file" id="dbFile" accept=".json,application/json" style="display:none"></div>';
 document.querySelector('.view').parentNode.appendChild(v);
 var dbY=0;function show(on){if(on)dbY=window.scrollY;document.querySelectorAll('.view').forEach(function(x){x.classList.remove('active')});(on?v:$('searchView')).classList.add('active');if(window.toggleFab)toggleFab(false);if(on)draw();window.scrollTo(0,on?0:dbY)}
@@ -34,14 +34,14 @@ function draw(){
  var c={confirmed:0,estimated:0,rar:0,unknown:0},g='';
  for(var s=1;s<=100;s++){var e=eff(arr,s),lab=e.name||(e.rarity?'':'未確認');
   if(e.cert==='unknown'&&!e.name&&!e.rarity)c.unknown++;else if(e.cert==='estimated')c.estimated++;else if(e.cert==='confirmed'&&e.name)c.confirmed++;else c.rar++;
-  g+='<button class="dbc r-'+e.rarity+' c-'+e.cert+'" data-s="'+s+'"><b>'+s+'</b>'+(e.rarity||'？')+' '+MARK[e.cert]+'</button>'}
+  g+='<button class="dbc r-'+e.rarity+' c-'+e.cert+'" data-s="'+s+'"><b>'+s+'</b>'+(e.rarity||'？')+' '+MARK[e.cert]+(e.ids&&e.ids.length?'<small style="display:block;color:#666">'+e.ids[0]+(e.ids.length>1?'+':'')+'</small>':'')+'</button>'}
  $('dbGrid').innerHTML=g;var p=0;
  $('dbProg').innerHTML='<b>配列 No.'+arr+'</b>　確認済み '+c.confirmed+'／推定 '+c.estimated+'／レアリティのみ '+c.rar+'／未判明 '+c.unknown+'<br><small>確＝確認済み　推＝推定　－＝不明　ピンク枠＝パラレル</small>';
- $('dbBk').textContent=db.lastBackup?'最後の書き出し：'+db.lastBackup:'まだ書き出していません。こまめに書き出して保管してください。'}
+ $('dbBk').textContent='[版 '+VER+'] '+(db.lastBackup?'最後の書き出し：'+db.lastBackup:'まだ書き出していません。こまめに書き出して保管してください。');drawObs()}
 $('dbEd').onchange=function(){ed=this.value;arr='1';draw()};$('dbArr').onchange=function(){arr=this.value;draw()};
 $('dbGrid').onclick=function(ev){var b=ev.target.closest('.dbc');if(b)sheet(+b.dataset.s)};
 function sheet(s){var e=eff(arr,s),r=e.rec||{},old=$('dbSheet');if(old)old.remove();
- if(db.editions[ed].locked){var q=document.createElement('div');q.id='dbSheet';q.className='dbsheet';q.innerHTML='<b>配列 No.'+arr+'　'+s+'枠目</b><br>'+(e.name?esc(e.name):'カード名未記載')+'<br>レアリティ：'+(e.rarity||'不明')+'<br><small>第1弾はPDF資料で確定済みのため、編集できません。</small><div class="row"><button class="g" id="x9">閉じる</button></div>';document.body.appendChild(q);$('x9').onclick=function(){q.remove()};return}
+ if(db.editions[ed].locked){var ops=(base(arr,s)||{options:[]}).options,h=ops.map(function(o){var im=window.getCardImagePath?getCardImagePath(o.id,o.star):'';return'<div style="display:flex;gap:12px;margin:10px 0;align-items:center">'+(im?'<img src="'+im+'" style="width:92px;border-radius:8px">':'')+'<div><b>No.'+o.id+'</b>'+(o.star?'　パラレル':'')+'<br>'+esc(o.name)+'</div></div>'}).join('')||'カード名未記載';var q=document.createElement('div');q.id='dbSheet';q.className='dbsheet';q.innerHTML='<b>配列 No.'+arr+'　'+s+'枠目</b><br>'+h+'<br>レアリティ：'+(e.rarity||'不明')+'<br><small>第1弾はPDF資料で確定済みのため、編集できません。</small><div class="row"><button class="g" id="x9">閉じる</button></div>';document.body.appendChild(q);$('x9').onclick=function(){q.remove()};return}
  var d=document.createElement('div');d.id='dbSheet';d.className='dbsheet';
  d.innerHTML='<b>配列 No.'+arr+'　'+s+'枠目</b>'+(e.src==='base'?'<br><small>初期資料：'+esc(e.name||'カード名未記載')+'（'+e.rarity+'）。保存すると自分の記録として別に残り、初期資料は変わりません。</small>':'')+
  '<label>カード名（不明なら空欄）</label><input id="f1" value="'+esc(r.name||'')+'"><label>レアリティ</label><select id="f2">'+RAR.map(function(x){return'<option value="'+x+'"'+(x===(r.rarity||(e.src==='base'?e.rarity:''))?' selected':'')+'>'+(x||'不明')+'</option>'}).join('')+'</select>'+
@@ -62,6 +62,21 @@ $('dbImp').onclick=function(){$('dbFile').click()};
 $('dbFile').onchange=function(){var f=this.files[0];if(!f)return;var rd=new FileReader();rd.onload=function(){try{var j=JSON.parse(rd.result);if(j.format!=='aikatsu-user-db')throw 0;var d=j.data,add=0,same=0,diff=[];
  Object.keys(d.editions).forEach(function(e){if(!db.editions[e])db.editions[e]=d.editions[e];else if(d.editions[e].arrays>db.editions[e].arrays)db.editions[e].arrays=d.editions[e].arrays});
  Object.keys(d.slots).forEach(function(key){var n=d.slots[key],o=db.slots[key];if(!o){db.slots[key]=n;add++}else if(o.name===n.name&&o.rarity===n.rarity&&o.cert===n.cert)same++;else diff.push(key)});
- var up=0;if(diff.length&&confirm('食い違う枠が'+diff.length+'件あります。ファイルの内容で上書きしますか？\n（キャンセル＝今のデータを残す）')){diff.forEach(function(key){db.slots[key]=d.slots[key];up++})}
+ (d.obsSeq||[]).forEach(function(x){db.obsSeq=db.obsSeq||[];if(!db.obsSeq.some(function(y){return okey(y)===okey(x)}))db.obsSeq.push(x)});var up=0;if(diff.length&&confirm('食い違う枠が'+diff.length+'件あります。ファイルの内容で上書きしますか？\n（キャンセル＝今のデータを残す）')){diff.forEach(function(key){db.slots[key]=d.slots[key];up++})}
  save();draw();alert('追加 '+add+'件／同じ '+same+'件／上書き '+up+'件／残した '+(diff.length-up)+'件')}catch(e){alert('このファイルは読み込めませんでした。')}};rd.readAsText(f);this.value=''};
+function okey(x){return x.ed+'|'+x.side+'|'+x.at+'|'+x.cards.map(function(c){return c.id+':'+c.name}).join(',')}
+function chains(list){var c=list.map(function(x){return x.cards.slice()}),M=3,go=true;
+ while(go){go=false;
+  outer:for(var i=0;i<c.length;i++)for(var j=0;j<c.length;j++){if(i===j)continue;var a=c[i],b=c[j];
+   for(var n=Math.min(a.length,b.length);n>=M;n--){var ok=true;for(var t=0;t<n;t++){if(a[a.length-n+t].id!==b[t].id||a[a.length-n+t].name!==b[t].name){ok=false;break}}
+    if(ok){c[i]=a.concat(b.slice(n));c.splice(j,1);go=true;break outer}}}}
+ return c.sort(function(x,y){return y.length-x.length})}
+function drawObs(){var o=$('dbObs');if(!o)return;if(db.editions[ed].locked){o.innerHTML='';return}
+ db.obsSeq=db.obsSeq||[];var L=db.obsSeq.filter(function(x){return x.ed===ed}),h='<div class="dbprog"><b>観測した並び</b>（'+L.length+'件）<div class="dbbar"><button id="ob1">入力中の左を保存</button><button id="ob2">入力中の右を保存</button></div>';
+ if(L.length){h+='<b>並び順の推定</b><br><small>3枚以上重なる観測どうしを連結します。推定のため、確認済みにはなりません。</small>'+chains(L).map(function(c,i){return'<div style="margin:8px 0">連なり'+(i+1)+'：'+c.length+'枚　<small>推定</small><br><small>'+c.map(function(x){return esc(x.id+':'+x.name)+(x.rarity&&x.rarity!=='N'?'['+x.rarity+']':'')}).join(' → ')+'</small></div>'}).join('')+'<div class="dbbar"><button id="ob3">この弾の観測を全削除</button></div>'}
+ o.innerHTML=h+'</div>';
+ [['ob1','left'],['ob2','right']].forEach(function(p){$(p[0]).onclick=function(){var hs=(window.histories||{})[p[1]]||[];if(!hs.length){alert('検索画面に入力中のカードがありません。');return}
+  var x={ed:ed,side:p[1],at:new Date().toISOString().slice(0,10),cards:hs.map(function(c){return{id:c.id,name:c.name,rarity:c.rarity}})};
+  if(db.obsSeq.some(function(y){return okey(y)===okey(x)})){alert('同じ観測がすでに保存されています。');return}db.obsSeq.push(x);save();draw()}});
+ if($('ob3'))$('ob3').onclick=function(){if(confirm('この弾の観測列をすべて削除しますか？')){db.obsSeq=db.obsSeq.filter(function(x){return x.ed!==ed});save();draw()}}}
 })();
