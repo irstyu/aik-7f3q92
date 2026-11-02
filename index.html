@@ -141,6 +141,12 @@ body.hide-images .slotopt { flex-direction: row; padding: 4px 8px; max-width: no
 .saved-data-list { margin-top: 10px; display: flex; flex-direction: column; gap: 8px; }
 .saved-item { display: flex; justify-content: space-between; align-items: center; background: white; border: 1px solid var(--line); padding: 8px 12px; border-radius: 8px; font-size: 0.85rem; }
 .saved-item-actions { display: flex; gap: 6px; }
+
+.fab-container{gap:8px!important}
+.fab-btn,.fab-btn.secondary{width:auto!important;min-width:88px;height:44px!important;padding:0 16px;border-radius:12px!important;font-size:14px!important;font-weight:600;letter-spacing:.04em;background:rgba(255,255,255,.96)!important;color:#20243a!important;border:1px solid #d9dde8!important;box-shadow:0 4px 14px rgba(32,36,58,.12)!important;pointer-events:auto;backdrop-filter:blur(6px)}
+.fab-btn.primary{background:#e85b91!important;color:#fff!important;border-color:#e85b91!important}
+.fab-btn:active{transform:scale(.97)}
+.btn-action,.allbtn{letter-spacing:.03em}
 </style>
 
 </head>
@@ -174,7 +180,7 @@ body.hide-images .slotopt { flex-direction: row; padding: 4px 8px; max-width: no
 <div id="historyChips" class="chips"></div>
 </div>
 <div class="view-header-actions" style="margin-top: 15px;">
-  <button class="btn-action save" onclick="saveCurrentHistory()">💾 入力中の配列を保存</button>
+  <button class="btn-action save" onclick="saveCurrentHistory()"> 入力中の配列を保存</button>
 </div>
 <div style="margin-top: 20px;">
   <div class="resulttitle"><h2>保存済みデータ</h2></div>
@@ -193,11 +199,11 @@ body.hide-images .slotopt { flex-direction: row; padding: 4px 8px; max-width: no
 </section>
 
 <div id="arrayFabContainer" class="fab-container" style="display: none;">
-  <button class="fab-btn secondary" onclick="goNextCard()" title="次のカードへ">⏭️</button>
-  <button class="fab-btn secondary" onclick="goPrevCard()" title="前のカードへ">⏮️</button>
-  <button class="fab-btn" onclick="scrollToCurrentPos()" title="現在地へ戻る">🎯</button>
-  <button class="fab-btn secondary" onclick="scrollToTop()" title="ページトップへ">⬆️</button>
-  <button class="fab-btn secondary" onclick="backToSearch()" title="入力中の配列一覧へ戻る">🔙</button>
+  <button class="fab-btn" onclick="goNextCard()" title="次のカードへ">次へ</button>
+  <button class="fab-btn" onclick="goPrevCard()" title="前のカードへ">前へ</button>
+  <button class="fab-btn primary" onclick="scrollToCurrentPos()" title="現在地へ戻る">現在地</button>
+  <button class="fab-btn" onclick="scrollToTop()" title="ページトップへ">トップ</button>
+  <button class="fab-btn" onclick="backToSearch()" title="入力中の配列一覧へ戻る">入力へ戻る</button>
 </div>
 
 </main>
@@ -291,10 +297,10 @@ function render(){
   return `<button type="button" class="cardresult" onclick="viewArrayDetail('${x.no}', ${m.last})">
     <div class="rhead">
       <strong>No.${x.no}</strong>
-      <span class="matchtype ${m.gaps?'gap':''}">${m.gaps===0?'✓ 連続一致':'順番一致・間に'+m.gaps+'枠'}</span>
+      <span class="matchtype ${m.gaps?'gap':''}">${m.gaps===0?' 連続一致':'順番一致・間に'+m.gaps+'枠'}</span>
     </div>
     <div class="meta">${hist.length}枚が一致 ／ 現在地：${m.last+1}枠目</div>
-    <div class="tap-hint">👉 タップしてこの配列の現在位置＆全100枠を見る</div>
+    <div class="tap-hint"> タップしてこの配列の現在位置＆全100枠を見る</div>
     <div class="rares">
       <b>この先の高レア枠</b>
       ${rare.length?rare.map(r=>{
@@ -480,6 +486,12 @@ function showArray(n, highlightIndex = -1){
 
 render();
 
+</script>
+<script>
+(function(){var y=0;
+['viewArrayDetail','showAllArrays'].forEach(function(n){var f=window[n];window[n]=function(){y=window.scrollY;return f.apply(this,arguments)}});
+var b=window.backToSearch;window.backToSearch=function(){var r=b.apply(this,arguments);var p=y;requestAnimationFrame(function(){window.scrollTo(0,p);setTimeout(function(){window.scrollTo(0,p)},60)});return r};
+})();
 </script>
 <script src="db.js"></script>
 <script>if('serviceWorker' in navigator){window.addEventListener('load',function(){navigator.serviceWorker.register('sw.js').catch(function(){})})}</script>

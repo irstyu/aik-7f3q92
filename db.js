@@ -1,10 +1,10 @@
 // 配列データベース（ブラウザ内保存）。初期データ(arrays)は読み取り専用で、書き換えません。
 (function(){
-var KEY='aikatsu_db_v1',CERT={confirmed:'確認済み',estimated:'推定',unknown:'不明'},MARK={confirmed:'✔',estimated:'？',unknown:'・'};
+var KEY='aikatsu_db_v1',CERT={confirmed:'確認済み',estimated:'推定',unknown:'不明'},MARK={confirmed:'確',estimated:'推',unknown:'－'};
 var RAR=['','N','PR','ER','PAR'],SIDE={'':'未記録',left:'左',right:'右',unknown:'不明'};
 var db=load(),ed='1',arr='1',$=function(i){return document.getElementById(i)};
-function load(){try{var d=JSON.parse(localStorage.getItem(KEY));if(d&&d.slots)return d}catch(e){}
- return{v:1,editions:{'1':{label:'第1弾',arrays:12}},slots:{},lastBackup:null}}
+function load(){try{var d=JSON.parse(localStorage.getItem(KEY));if(d&&d.slots){if(!d.seed1){Object.keys(d.slots).forEach(function(x){if(x.indexOf('1-')===0)delete d.slots[x]});d.seed1=true}if(d.editions&&d.editions['1'])d.editions['1'].locked=true;return d}}catch(e){}
+ return{v:1,editions:{'1':{label:'第1弾',arrays:12,locked:true}},slots:{},lastBackup:null,seed1:true}}
 function save(){try{localStorage.setItem(KEY,JSON.stringify(db))}catch(e){alert('保存に失敗しました。バックアップを書き出してください。')}}
 function k(e,a,s){return e+'-'+a+'-'+s}
 function base(a,s){var b=(ed==='1'&&window.arrays&&arrays[a])?arrays[a][s-1]:null;return b}
@@ -22,10 +22,10 @@ var css=document.createElement('style');css.textContent=
 document.head.appendChild(css);
 var v=document.createElement('section');v.id='dbView';v.className='view';
 v.innerHTML='<div class="arrayhead"><button class="back" id="dbBack">← 戻る</button><h2>配列データベース</h2></div><div class="dbbar"><select id="dbEd"></select><select id="dbArr"></select></div><div id="dbProg" class="dbprog"></div><div id="dbGrid" class="dbgrid"></div>'+
-'<div class="dbbar" style="margin-top:14px"><button id="dbAddEd">＋新しい弾</button><button id="dbAddArr">＋新しい配列</button></div><div class="dbprog"><b>バックアップ</b><div id="dbBk"></div><div class="dbbar"><button id="dbExp">📤 書き出し</button><button id="dbImp">📥 復元（追加）</button></div><input type="file" id="dbFile" accept=".json,application/json" style="display:none"></div>';
+'<div class="dbbar" style="margin-top:14px"><button id="dbAddEd">＋新しい弾</button><button id="dbAddArr">＋新しい配列</button></div><div class="dbprog"><b>バックアップ</b><div id="dbBk"></div><div class="dbbar"><button id="dbExp"> 書き出し</button><button id="dbImp"> 復元（追加）</button></div><input type="file" id="dbFile" accept=".json,application/json" style="display:none"></div>';
 document.querySelector('.view').parentNode.appendChild(v);
-function show(on){document.querySelectorAll('.view').forEach(function(x){x.classList.remove('active')});(on?v:$('searchView')).classList.add('active');if(window.toggleFab)toggleFab(false);if(on)draw();window.scrollTo(0,0)}
-var open=document.createElement('button');open.className='allbtn';open.textContent='📚 データベース';open.style.cssText='width:100%;margin:8px 0;padding:14px;font-size:16px';open.onclick=function(){show(true)};
+var dbY=0;function show(on){if(on)dbY=window.scrollY;document.querySelectorAll('.view').forEach(function(x){x.classList.remove('active')});(on?v:$('searchView')).classList.add('active');if(window.toggleFab)toggleFab(false);if(on)draw();window.scrollTo(0,on?0:dbY)}
+var open=document.createElement('button');open.className='allbtn';open.textContent='データベース';open.style.cssText='width:100%;margin:8px 0;padding:14px;font-size:16px';open.onclick=function(){show(true)};
 var sv=$('searchView');sv.insertBefore(open,sv.firstChild);$('dbBack').onclick=function(){show(false)};
 function nArr(){return db.editions[ed].arrays}
 function draw(){
@@ -36,11 +36,12 @@ function draw(){
   if(e.cert==='unknown'&&!e.name&&!e.rarity)c.unknown++;else if(e.cert==='estimated')c.estimated++;else if(e.cert==='confirmed'&&e.name)c.confirmed++;else c.rar++;
   g+='<button class="dbc r-'+e.rarity+' c-'+e.cert+'" data-s="'+s+'"><b>'+s+'</b>'+(e.rarity||'？')+' '+MARK[e.cert]+'</button>'}
  $('dbGrid').innerHTML=g;var p=0;
- $('dbProg').innerHTML='<b>配列 No.'+arr+'</b>　確認済み '+c.confirmed+'／推定 '+c.estimated+'／レアリティのみ '+c.rar+'／未判明 '+c.unknown+'<br><small>✔確認済み ？推定 ・不明　ピンク枠＝パラレル　点線＝推定</small>';
+ $('dbProg').innerHTML='<b>配列 No.'+arr+'</b>　確認済み '+c.confirmed+'／推定 '+c.estimated+'／レアリティのみ '+c.rar+'／未判明 '+c.unknown+'<br><small>確＝確認済み　推＝推定　－＝不明　ピンク枠＝パラレル</small>';
  $('dbBk').textContent=db.lastBackup?'最後の書き出し：'+db.lastBackup:'まだ書き出していません。こまめに書き出して保管してください。'}
 $('dbEd').onchange=function(){ed=this.value;arr='1';draw()};$('dbArr').onchange=function(){arr=this.value;draw()};
 $('dbGrid').onclick=function(ev){var b=ev.target.closest('.dbc');if(b)sheet(+b.dataset.s)};
 function sheet(s){var e=eff(arr,s),r=e.rec||{},old=$('dbSheet');if(old)old.remove();
+ if(db.editions[ed].locked){var q=document.createElement('div');q.id='dbSheet';q.className='dbsheet';q.innerHTML='<b>配列 No.'+arr+'　'+s+'枠目</b><br>'+(e.name?esc(e.name):'カード名未記載')+'<br>レアリティ：'+(e.rarity||'不明')+'<br><small>第1弾はPDF資料で確定済みのため、編集できません。</small><div class="row"><button class="g" id="x9">閉じる</button></div>';document.body.appendChild(q);$('x9').onclick=function(){q.remove()};return}
  var d=document.createElement('div');d.id='dbSheet';d.className='dbsheet';
  d.innerHTML='<b>配列 No.'+arr+'　'+s+'枠目</b>'+(e.src==='base'?'<br><small>初期資料：'+esc(e.name||'カード名未記載')+'（'+e.rarity+'）。保存すると自分の記録として別に残り、初期資料は変わりません。</small>':'')+
  '<label>カード名（不明なら空欄）</label><input id="f1" value="'+esc(r.name||'')+'"><label>レアリティ</label><select id="f2">'+RAR.map(function(x){return'<option value="'+x+'"'+(x===(r.rarity||(e.src==='base'?e.rarity:''))?' selected':'')+'>'+(x||'不明')+'</option>'}).join('')+'</select>'+
@@ -55,7 +56,7 @@ function sheet(s){var e=eff(arr,s),r=e.rec||{},old=$('dbSheet');if(old)old.remov
   var obs=(ex&&ex.obs)||[];obs.push({side:$('f4').value,at:new Date().toISOString().slice(0,10)});
   db.slots[key]={ed:ed,arr:+arr,slot:s,name:n.name,rarity:n.rarity,cert:n.cert,obs:obs};save();d.remove();draw()}}
 $('dbAddEd').onclick=function(){var l=prompt('新しい弾の名前（例：第2弾）');if(!l)return;var id=String(Math.max.apply(null,Object.keys(db.editions).map(Number))+1);db.editions[id]={label:l,arrays:12};ed=id;arr='1';save();draw()};
-$('dbAddArr').onclick=function(){if(confirm('この弾に配列を1つ追加しますか？')){db.editions[ed].arrays++;save();draw()}};
+$('dbAddArr').onclick=function(){if(db.editions[ed].locked){alert('第1弾は確定済みのため、配列は追加できません。');return}if(confirm('この弾に配列を1つ追加しますか？')){db.editions[ed].arrays++;save();draw()}};
 $('dbExp').onclick=function(){db.lastBackup=new Date().toLocaleString('ja-JP');save();var b=new Blob([JSON.stringify({format:'aikatsu-user-db',v:1,data:db},null,1)],{type:'application/json'}),a=document.createElement('a');a.href=URL.createObjectURL(b);a.download='aikatsu_db_'+new Date().toISOString().slice(0,10)+'.json';document.body.appendChild(a);a.click();a.remove();draw()};
 $('dbImp').onclick=function(){$('dbFile').click()};
 $('dbFile').onchange=function(){var f=this.files[0];if(!f)return;var rd=new FileReader();rd.onload=function(){try{var j=JSON.parse(rd.result);if(j.format!=='aikatsu-user-db')throw 0;var d=j.data,add=0,same=0,diff=[];
