@@ -1,13 +1,13 @@
 // 配列データベース（ブラウザ内保存）。初期データ(arrays)は読み取り専用で、書き換えません。
 (function(){
-var VER='3.2',KEY='aikatsu_db_v1',CERT={confirmed:'確認済み',estimated:'推定',unknown:'不明'},MARK={confirmed:'確',estimated:'推',unknown:'－'};
+var VER='3.3',KEY='aikatsu_db_v1',CERT={confirmed:'確認済み',estimated:'推定',unknown:'不明'},MARK={confirmed:'確',estimated:'推',unknown:'－'};
 var RAR=['','N','PR','ER','PAR'],SIDE={'':'未記録',left:'左',right:'右',unknown:'不明'};
 var db=load(),ed='1',arr='1',$=function(i){return document.getElementById(i)};
 function load(){try{var d=JSON.parse(localStorage.getItem(KEY));if(d&&d.slots){if(!d.seed1){Object.keys(d.slots).forEach(function(x){if(x.indexOf('1-')===0)delete d.slots[x]});d.seed1=true}if(d.editions&&d.editions['1'])d.editions['1'].locked=true;return d}}catch(e){}
  return{v:1,editions:{'1':{label:'第1弾',arrays:12,locked:true}},slots:{},lastBackup:null,seed1:true}}
 function save(){try{localStorage.setItem(KEY,JSON.stringify(db))}catch(e){alert('保存に失敗しました。バックアップを書き出してください。')}}
 function k(e,a,s){return e+'-'+a+'-'+s}
-function base(a,s){var b=(ed==='1'&&window.arrays&&arrays[a])?arrays[a][s-1]:null;return b}
+function base(a,s){var b=(ed==='1'&&typeof arrays!=='undefined'&&arrays[a])?arrays[a][s-1]:null;return b}
 function eff(a,s){var r=db.slots[k(ed,a,s)],b=base(a,s);
  if(r)return{name:r.name||'',rarity:r.rarity||(b?b.rarity:''),cert:r.cert,src:'user',rec:r};
  if(b)return{ids:b.options.map(function(o){return o.id}),name:b.options.length?b.options.map(function(o){return(o.star?'★':'')+o.id+':'+o.name}).join(' / '):'',rarity:b.rarity,cert:'confirmed',src:'base'};
@@ -21,7 +21,7 @@ var css=document.createElement('style');css.textContent=
 '.dbsheet label{display:block;margin-top:8px;font-size:14px}.dbsheet input,.dbsheet select{width:100%;font-size:17px;padding:11px;border-radius:10px;border:1px solid var(--line)}.dbsheet .row{display:flex;gap:8px;margin-top:12px}.dbsheet .row button{flex:1;padding:14px;font-size:16px;border-radius:10px;border:0;background:var(--accent);color:#fff}.dbsheet .row .g{background:#e9ecf3;color:#333}.dbsheet .row .d{background:#d9534f}';
 document.head.appendChild(css);
 var v=document.createElement('section');v.id='dbView';v.className='view';
-v.innerHTML='<div class="arrayhead"><button class="back" id="dbBack">← 戻る</button><h2>配列データベース <small style="color:#888;font-size:12px">v3.2</small></h2></div><div class="dbbar"><select id="dbEd"></select><select id="dbArr"></select></div><div id="dbProg" class="dbprog"></div><div id="dbGrid" class="dbgrid"></div><div id="dbObs"></div>'+
+v.innerHTML='<div class="arrayhead"><button class="back" id="dbBack">← 戻る</button><h2>配列データベース <small style="color:#888;font-size:12px">v3.3</small></h2></div><div class="dbbar"><select id="dbEd"></select><select id="dbArr"></select></div><div id="dbProg" class="dbprog"></div><div id="dbGrid" class="dbgrid"></div><div id="dbObs"></div>'+
 '<div class="dbbar" style="margin-top:14px"><button id="dbAddEd">＋新しい弾</button><button id="dbAddArr">＋新しい配列</button></div><div class="dbprog"><b>バックアップ</b><div id="dbBk"></div><div class="dbbar"><button id="dbExp"> 書き出し</button><button id="dbImp"> 復元（追加）</button></div><input type="file" id="dbFile" accept=".json,application/json" style="display:none"></div>';
 document.querySelector('.view').parentNode.appendChild(v);
 var dbY=0;function show(on){if(on)dbY=window.scrollY;document.querySelectorAll('.view').forEach(function(x){x.classList.remove('active')});(on?v:$('searchView')).classList.add('active');if(window.toggleFab)toggleFab(false);if(on)draw();window.scrollTo(0,on?0:dbY)}
@@ -73,10 +73,28 @@ function chains(list){var c=list.map(function(x){return x.cards.slice()}),M=3,go
  return c.sort(function(x,y){return y.length-x.length})}
 function drawObs(){var o=$('dbObs');if(!o)return;if(db.editions[ed].locked){o.innerHTML='';return}
  db.obsSeq=db.obsSeq||[];var L=db.obsSeq.filter(function(x){return x.ed===ed}),h='<div class="dbprog"><b>観測した並び</b>（'+L.length+'件）<div class="dbbar"><button id="ob1">入力中の左を保存</button><button id="ob2">入力中の右を保存</button></div>';
- if(L.length){h+='<b>並び順の推定</b><br><small>3枚以上重なる観測どうしを連結します。推定のため、確認済みにはなりません。</small>'+chains(L).map(function(c,i){return'<div style="margin:8px 0">連なり'+(i+1)+'：'+c.length+'枚　<small>推定</small><br><small>'+c.map(function(x){return esc(x.id+':'+x.name)+(x.rarity&&x.rarity!=='N'?'['+x.rarity+']':'')}).join(' → ')+'</small></div>'}).join('')+'<div class="dbbar"><button id="ob3">この弾の観測を全削除</button></div>'}
- o.innerHTML=h+'</div>';
- [['ob1','left'],['ob2','right']].forEach(function(p){$(p[0]).onclick=function(){var hs=(window.histories||{})[p[1]]||[];if(!hs.length){alert('検索画面に入力中のカードがありません。');return}
+ if(L.length){h+='<b>並び順の推定</b><br><small>3枚以上重なる観測どうしを連結します。推定のため、確認済みにはなりません。</small>'+chains(L).map(function(c,i){return'<div style="margin:8px 0">連なり'+(i+1)+'：'+c.length+'枚　<small>推定</small><br><small>'+c.map(function(x){return esc(x.id+':'+x.name)+(x.rarity&&x.rarity!=='N'?'['+x.rarity+']':'')}).join(' → ')+'</small><br><button class="ob-as" data-ci="'+i+'" style="margin-top:6px;padding:10px 14px;border-radius:10px;border:1px solid var(--line);background:#fff;font-size:15px">配列に当てはめる</button></div>'}).join('')+'<div class="dbbar"><button id="ob3">この弾の観測を全削除</button></div>'}
+ o.innerHTML=h+'</div>';o.querySelectorAll('.ob-as').forEach(function(b){b.onclick=function(){assign(chains(L)[+b.dataset.ci])}});
+ [['ob1','left'],['ob2','right']].forEach(function(p){$(p[0]).onclick=function(){var hs=(typeof histories!=='undefined'?histories:{})[p[1]]||[];if(!hs.length){alert('検索画面に入力中のカードがありません。');return}
   var x={ed:ed,side:p[1],at:new Date().toISOString().slice(0,10),cards:hs.map(function(c){return{id:c.id,name:c.name,rarity:c.rarity}})};
   if(db.obsSeq.some(function(y){return okey(y)===okey(x)})){alert('同じ観測がすでに保存されています。');return}db.obsSeq.push(x);save();draw()}});
  if($('ob3'))$('ob3').onclick=function(){if(confirm('この弾の観測列をすべて削除しますか？')){db.obsSeq=db.obsSeq.filter(function(x){return x.ed!==ed});save();draw()}}}
+
+function assign(c){if(!c)return;var a=parseInt(prompt('この連なり（'+c.length+'枚）を当てはめる配列No.を入力（1〜'+nArr()+'）'),10);if(!(a>=1&&a<=nArr())){alert('配列No.が正しくありません。');return}
+ var st=parseInt(prompt('先頭のカードが入る枠番号（1〜100）'),10);if(!(st>=1&&st<=100)){alert('枠番号が正しくありません。');return}
+ if(st+c.length-1>100&&!confirm('100枠を超える分は反映されません。続けますか？'))return;
+ var add=0,skip=0;c.forEach(function(x,i){var s=st+i;if(s>100)return;var key=k(ed,a,s),ex=db.slots[key];
+  if(ex&&(ex.cert==='confirmed'||(ex.name&&ex.name!==x.name))){skip++;return}
+  db.slots[key]={ed:ed,arr:a,slot:s,name:x.name,rarity:x.rarity||'',cert:'estimated',obs:(ex&&ex.obs)||[]};add++});
+ save();arr=String(a);draw();alert('推定として'+add+'枠を記録しました。既存の記録があるため保存しなかった枠：'+skip+'枠')}
+function find(c,hs){for(var i=0;i+hs.length<=c.length;i++){var ok=true;for(var t=0;t<hs.length;t++){if(c[i+t].id!==hs[t].id||c[i+t].name!==hs[t].name){ok=false;break}}if(ok)return i}return-1}
+function drawMatch(){var p=$('dbMatch');if(!p)return;p.innerHTML='';var H=typeof histories!=='undefined'?histories:null,sd=typeof currentSide!=='undefined'?currentSide:'right';if(!H)return;var hs=H[sd]||[];
+ if(hs.length<3)return;db.obsSeq=db.obsSeq||[];var out=[];
+ Object.keys(db.editions).forEach(function(e){if(db.editions[e].locked)return;var L=db.obsSeq.filter(function(x){return x.ed===e});if(!L.length)return;
+  chains(L).forEach(function(c,ci){var at=find(c,hs);if(at>=0)out.push({e:e,ci:ci,at:at,nx:c.slice(at+hs.length,at+hs.length+5)})})});
+ if(!out.length)return;
+ p.innerHTML='<div class="dbprog"><b>保存済みの観測と一致</b>　<small>推定</small>'+out.map(function(o){return'<div style="margin-top:8px">'+esc(db.editions[o.e].label)+'　連なり'+(o.ci+1)+'の'+(o.at+1)+'枚目から一致<br><small>この先：'+(o.nx.length?o.nx.map(function(x){return esc(x.id+':'+x.name)+(x.rarity&&x.rarity!=='N'?'['+x.rarity+']':'')}).join(' → '):'まだ記録がありません')+'</small></div>'}).join('')+'</div>'}
+var mp=document.createElement('div');mp.id='dbMatch';var rt=document.querySelector('.resulttitle');if(rt&&rt.parentNode)rt.parentNode.insertBefore(mp,rt);
+var r0=window.render;if(r0)window.render=function(){var v=r0.apply(this,arguments);try{drawMatch()}catch(e){}return v};
+try{drawMatch()}catch(e){}
 })();
