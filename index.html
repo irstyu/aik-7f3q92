@@ -199,8 +199,8 @@ body.hide-images .slotopt { flex-direction: row; padding: 4px 8px; max-width: no
 </section>
 
 <div id="arrayFabContainer" class="fab-container" style="display: none;">
-  <button class="fab-btn" onclick="goNextCard()" title="次のカードへ">次へ</button>
   <button class="fab-btn" onclick="goPrevCard()" title="前のカードへ">前へ</button>
+  <button class="fab-btn" onclick="goNextCard()" title="次のカードへ">次へ</button>
   <button class="fab-btn primary" onclick="scrollToCurrentPos()" title="現在地へ戻る">現在地</button>
   <button class="fab-btn" onclick="scrollToTop()" title="ページトップへ">トップ</button>
   <button class="fab-btn" onclick="backToSearch()" title="入力中の配列一覧へ戻る">入力へ戻る</button>
@@ -293,13 +293,13 @@ function render(){
  if(!ranked.length){$('results').className='empty';$('results').textContent='一致する配列が見つかりません。カードの入力間違いがないか確認してね。';return}
  $('results').className='';
  $('results').innerHTML=ranked.map(x=>{
-  const m=x.match, rare=nextRare(x.slots,m.last);
+  const m=Object.assign({},x.match), ov=window.advOf?advOf(x.no):null; if(ov!==null)m.last=ov; const rare=nextRare(x.slots,m.last);
   return `<button type="button" class="cardresult" onclick="viewArrayDetail('${x.no}', ${m.last})">
     <div class="rhead">
       <strong>No.${x.no}</strong>
       <span class="matchtype ${m.gaps?'gap':''}">${m.gaps===0?' 連続一致':'順番一致・間に'+m.gaps+'枠'}</span>
     </div>
-    <div class="meta">${hist.length}枚が一致 ／ 現在地：${m.last+1}枠目</div>
+    <div class="meta">${hist.length}枚が一致 ／ 現在地：${m.last+1}枠目${ov!==null?'（矢印で移動）':''}</div>
     <div class="tap-hint"> タップしてこの配列の現在位置＆全100枠を見る</div>
     <div class="rares">
       <b>この先の高レア枠</b>
@@ -493,6 +493,7 @@ render();
 var b=window.backToSearch;window.backToSearch=function(){var r=b.apply(this,arguments);var p=y;requestAnimationFrame(function(){window.scrollTo(0,p);setTimeout(function(){window.scrollTo(0,p)},60)});return r};
 })();
 </script>
+<script src="app.js"></script>
 <script src="db.js"></script>
 <script>if('serviceWorker' in navigator){window.addEventListener('load',function(){navigator.serviceWorker.register('sw.js').catch(function(){})})}</script>
 </body>
