@@ -1,0 +1,15 @@
+<!doctype html><html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>公開設定ツール</title>
+<script src="config.js"></script>
+<style>body{font-family:system-ui,sans-serif;max-width:520px;margin:0 auto;padding:16px}input,select,textarea,button{width:100%;font-size:17px;padding:11px;margin:6px 0;border-radius:10px;border:1px solid #ccd;box-sizing:border-box}button{background:#e85b91;color:#fff;border:0}textarea{height:230px;font-size:13px}</style></head><body>
+<h2>公開設定ツール</h2><p>入力すると、config.js に貼る内容ができます。空欄の項目は今のまま変わりません。</p>
+<label>公開状態</label><select id="m"><option value="gated">gated：コードを知る人だけ</option><option value="closed">closed：公開停止（自分だけ）</option><option value="open">open：誰でも</option></select>
+<label>新しいアクセスコード</label><input id="c" placeholder="変更しない場合は空欄">
+<label>自分用の鍵（オーナーキー）</label><input id="o" placeholder="変更しない場合は空欄">
+<button onclick="mk()">設定を作る</button><textarea id="out" readonly></textarea><button onclick="navigator.clipboard.writeText(out.value)">コピー</button>
+<script>
+var C=window.SITE_CONFIG;
+async function sha(t){var b=await crypto.subtle.digest("SHA-256",new TextEncoder().encode(C.salt+t));return Array.from(new Uint8Array(b)).map(x=>x.toString(16).padStart(2,"0")).join("")}
+m.value=C.mode;
+async function mk(){var ch=c.value.trim()?await sha(c.value.trim()):C.codeHash;var oh=o.value.trim()?await sha("owner:"+o.value.trim()):C.ownerHash;
+out.value='window.SITE_CONFIG={\n  mode:"'+m.value+'",\n  salt:"'+C.salt+'",\n  codeHash:"'+ch+'",\n  ownerHash:"'+oh+'",\n  closedMessage:"'+C.closedMessage+'"\n};\n'}
+</script></body></html>
