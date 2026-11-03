@@ -40,7 +40,7 @@ var sc=window.searchCards;if(sc)window.searchCards=function(q){var s=String(q).t
 function openCardList(){
  var rm={},seen={};
  Object.keys(arrays).forEach(function(n){arrays[n].forEach(function(sl){sl.options.forEach(function(o){var k=o.id+'|'+o.name+'|'+(o.star?1:0);if(!seen[k])seen[k]={id:o.id,name:o.name,star:!!o.star};(rm[k]=rm[k]||{})[sl.rarity]=1})})});
- var D=Object.keys(seen).map(function(k){var c=seen[k];c.r=c.star?['PAR']:Object.keys(rm[k]);c.img=getCardImagePath(c.id,c.star)||'';return c}).sort(function(a,b){return a.id-b.id||a.star-b.star});
+ var D=Object.keys(seen).map(function(k){var c=seen[k];c.r=c.star?['PAR']:Object.keys(rm[k]);var ip=getCardImagePath(c.id,c.star);c.img=ip?new URL(ip,location.href).href:'';return c}).sort(function(a,b){return a.id-b.id||a.star-b.star});
  var json=JSON.stringify(D).replace(/</g,'\\u003c');
  var page=`<!doctype html><html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex,nofollow"><title>収録カード一覧</title><style>
 body{margin:0;background:#f5f7fb;color:#20243a;font-family:system-ui,-apple-system,"Noto Sans JP",sans-serif}
