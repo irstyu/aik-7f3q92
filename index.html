@@ -4,6 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="theme-color" content="#e85b91">
+<meta name="robots" content="noindex,nofollow">
 <link rel="icon" type="image/png" href="favicon.png">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
 <link rel="manifest" href="manifest.webmanifest">
@@ -124,7 +125,7 @@ body.hide-images .slotopt { flex-direction: row; padding: 4px 8px; max-width: no
 }
 
 
-/* === フローティング＆ナビゲーションボタン === */
+/* === フローティング&ナビゲーションボタン === */
 .fab-container { position: fixed; bottom: calc(16px + env(safe-area-inset-bottom)); right: 14px; display: flex; flex-direction: column; gap: 10px; z-index: 100; pointer-events: none; }
 .fab-btn { width: 54px; height: 54px; border-radius: 50%; background: var(--accent); color: white; border: none; box-shadow: 0 4px 12px rgba(232,91,145,0.4); display: flex; align-items: center; justify-content: center; font-size: 1.2rem; cursor: pointer; pointer-events: auto; transition: transform 0.2s, background 0.2s; }
 .fab-btn:hover { transform: scale(1.08); background: #df4f88; }
@@ -147,6 +148,18 @@ body.hide-images .slotopt { flex-direction: row; padding: 4px 8px; max-width: no
 .fab-btn.primary{background:#e85b91!important;color:#fff!important;border-color:#e85b91!important}
 .fab-btn:active{transform:scale(.97)}
 .btn-action,.allbtn{letter-spacing:.03em}
+
+/* === v4 UI === */
+button{border-radius:12px}.btn-action,.ghost,.arrbtn,.tab,.allbtn,.addbtn,.suggestion{border-radius:12px}
+.fab-container{gap:8px!important}
+.fab-btn,.fab-btn.secondary,.fab-btn.primary{width:122px!important;min-width:122px!important;height:44px!important;padding:0 10px!important;border-radius:12px!important;display:flex!important;align-items:center;justify-content:center;gap:4px;white-space:nowrap;font-size:14px!important;font-weight:700}
+.edition{flex-wrap:wrap}.pills{display:flex;gap:6px;flex-wrap:wrap}.pill{border:1px solid #d9dde8;background:#fff;color:#20243a;border-radius:12px;padding:8px 14px;font-weight:700;font-size:14px}.pill.on{background:#e85b91;border-color:#e85b91;color:#fff}
+.searchbox input{font-size:15px}.searchbox input::placeholder{font-size:13px}
+#sideTitle{border-bottom:3px solid var(--accent);padding-bottom:3px}
+#candidateCount{font-size:1rem!important;font-weight:800;color:var(--ink)}
+.saved-item.is-new{background:#fff0f6;border-color:#e85b91}.saved-no{display:inline-block;min-width:22px;color:#e85b91;font-weight:900;margin-right:6px}.new-tag{background:#e85b91;color:#fff;font-size:.65rem;font-weight:800;padding:2px 8px;border-radius:99px;margin-left:8px;vertical-align:middle}
+.legal{margin-top:42px;padding-top:14px;border-top:1px solid var(--line);font-size:10.5px;color:#8a90a3;line-height:1.7}.legal p{margin:0 0 7px}.legal a{color:#8a90a3}
+.destrow{display:flex;gap:8px;align-items:center;margin-top:6px}.destrow select{flex:1;min-width:0;font-size:15px;padding:11px;border-radius:12px;border:1.5px solid #e85b91;color:#c0306b;background:#fff;font-weight:700}.destrow button{flex:none;padding:12px 22px;font-size:16px;border-radius:12px}
 </style>
 
 </head>
@@ -166,7 +179,7 @@ body.hide-images .slotopt { flex-direction: row; padding: 4px 8px; max-width: no
 <main>
 <section id="searchView" class="view active">
 <div class="hero"><div class="eyebrow">CARD ARRAY FINDER</div><h1>次のレアカードを見つけよう。</h1><p>出たカードを順番に入力すると、左右それぞれの配列候補を絞り込めます。</p></div>
-<div class="edition"><label for="editionSelect">弾を選択</label><select id="editionSelect"><option value="1">第1弾</option><option value="2" disabled>第2弾（データ追加待ち）</option></select></div><div class="searchbox"><input id="cardSearch" autocomplete="off" placeholder="カード番号・カード名で検索（例：24 / パフスリーブ）"><button class="addbtn" onclick="addSelected()">追加</button></div>
+<div class="edition"><label for="editionSelect">弾を選択</label><select id="editionSelect"><option value="1">第1弾</option><option value="2" disabled>第2弾(データ追加待ち)</option></select><button id="sugImgBtn" class="mini" type="button" style="margin-left:auto">候補画像 ON</button></div><div class="searchbox"><input id="cardSearch" autocomplete="off" placeholder="番号・カード名で検索 (例: 24)"><button class="addbtn" onclick="addSelected()">追加</button></div>
 <div id="suggestions" class="suggestions"></div>
 <div class="switchrow">
 <button id="leftTab" class="tab" onclick="switchSide('left')"><span class="circle">左</span>シリンダー</button>
@@ -174,7 +187,7 @@ body.hide-images .slotopt { flex-direction: row; padding: 4px 8px; max-width: no
 <button id="rightTab" class="tab active" onclick="switchSide('right')"><span class="circle">右</span>シリンダー</button>
 </div>
 <div class="stats"><strong id="sideTitle">右シリンダー</strong><span id="inputCount">0枚入力済み</span></div>
-<div class="legend"><span class="badge pr">PR</span><span class="badge er">ER</span><span class="badge par">★ パラレル</span></div>
+<div class="legend"><span class="badge pr">PR</span><span class="badge er">ER</span><span class="badge par">PR★(パラレル)</span></div>
 <div class="history">
 <div class="historytop"><b>入力したカード</b><div class="actions"><button class="ghost" onclick="undo()">1つ戻す</button><button class="ghost" onclick="clearCurrent()">クリア</button></div></div>
 <div id="historyChips" class="chips"></div>
@@ -187,25 +200,31 @@ body.hide-images .slotopt { flex-direction: row; padding: 4px 8px; max-width: no
   <div id="savedListContainer" class="saved-data-list"></div>
 </div>
 
-<div class="resulttitle"><h2>配列候補</h2><span id="candidateCount">入力待ち</span></div>
+<div class="resulttitle"><h2>配列候補</h2><div style="display:flex;align-items:center;gap:10px"><button id="resImgBtn" class="mini on" type="button">画像 ON</button><span id="candidateCount">入力待ち</span></div></div>
 <div id="results" class="empty">カードを入力すると、候補配列と次の高レア枠を表示します。</div>
 <div class="note">連続一致を最優先で表示し、間に未入力カードがある場合も順番が合えば候補に残します。複数のカード名がある枠は、1枠のランダム候補として判定します。</div>
 </section>
 <section id="arraysView" class="view">
-<div class="arrayhead"><button class="back" onclick="backToSearch()">← 戻る</button><h2>全配列表</h2></div>
+<div class="arrayhead"><h2>全配列表</h2></div>
 <p class="note">No.1〜12はそれぞれ独立した100枠の配列です。枠内に複数の名前がある場合は、その中からランダムに1枚が出る枠として表示します。</p>
 <div id="arrayGrid" class="arrgrid"></div>
 <div id="arrayDetail"></div>
 </section>
 
 <div id="arrayFabContainer" class="fab-container" style="display: none;">
-  <button class="fab-btn" onclick="goPrevCard()" title="前のカードへ">前へ</button>
-  <button class="fab-btn" onclick="goNextCard()" title="次のカードへ">次へ</button>
-  <button class="fab-btn primary" onclick="scrollToCurrentPos()" title="現在地へ戻る">現在地</button>
-  <button class="fab-btn" onclick="scrollToTop()" title="ページトップへ">トップ</button>
-  <button class="fab-btn" onclick="backToSearch()" title="入力中の配列一覧へ戻る">入力へ戻る</button>
+  <button class="fab-btn" onclick="goPrevCard()" title="前のカードへ"><i class="chev l"></i>前のカード</button>
+  <button class="fab-btn" onclick="goNextCard()" title="次のカードへ">次のカード<i class="chev r"></i></button>
+  <button class="fab-btn primary" onclick="scrollToCurrentPos()" title="現在位置へ戻る">現在位置</button>
+  <button class="fab-btn" onclick="scrollToTop()" title="ページトップへ"><i class="chev u"></i>TOP</button>
 </div>
 
+<footer class="legal">
+<p>© BNP/BANDAI, DENTSU, TV TOKYO<br>© BNP/AIKATSU 10TH STORY<br>© BANDAI</p>
+<p>本サイトは、個人が制作・運営する非公式のファンメイドサイトです。『アイカツ！アンコール』の公式運営元および各権利者とは一切関係ありません。</p>
+<p>本サイトは、利用料の徴収や広告収益の獲得を目的としない、非営利のファンサイトです。</p>
+<p>本サイトで使用している作品名、画像、その他のコンテンツに関する著作権・商標権その他の知的財産権は、各権利者に帰属します。</p>
+<p><a href="https://dcd.aikatsu.com/encore/" target="_blank" rel="noopener noreferrer">アイカツ！アンコール 公式サイト</a></p>
+</footer>
 </main>
 
 <script>
@@ -222,12 +241,13 @@ let currentActiveSlotIndex = -1;
 
 const allCards=[];
 Object.values(arrays).forEach(slots=>slots.forEach(s=>s.options.forEach(c=>allCards.push(c))));
-const unique=new Map();allCards.forEach(c=>unique.set(c.id+'|'+c.name,c));
-const cards=[...unique.values()].sort((a,b)=>a.id-b.id||a.name.localeCompare(b.name,'ja'));
+const unique=new Map();allCards.forEach(c=>unique.set(c.id+'|'+c.name+'|'+(c.star?1:0),c));
+const cards=[...unique.values()].sort((a,b)=>a.id-b.id||(a.star?1:0)-(b.star?1:0)||a.name.localeCompare(b.name,'ja'));
+const rarOf={};Object.values(arrays).forEach(sl=>sl.forEach(s=>s.options.forEach(o=>{rarOf[o.id+'|'+o.name+'|'+(o.star?1:0)]=s.rarity})));
 const $=id=>document.getElementById(id);
 function esc(s){return String(s).replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]))}
-function badge(r){if(r==='PR')return '<span class="badge pr">PR</span>';if(r==='ER')return '<span class="badge er">ER</span>';if(r==='PAR')return '<span class="badge par">★ パラレル</span>';return ''}
-function rarityName(r){return r==='PAR'?'パラレル':r}
+function badge(r){if(r==='PR')return '<span class="badge pr">PR</span>';if(r==='ER')return '<span class="badge er">ER</span>';if(r==='PAR')return '<span class="badge par">PR★</span>';return ''}
+function rarityName(r){return r==='PAR'?'PR★':r}
 
 function getCardImagePath(cardId, isStar) {
   const ed = $('editionSelect') ? $('editionSelect').value : '1';
@@ -249,18 +269,18 @@ function updateSuggestions(){
  const q=$('cardSearch').value, found=searchCards(q), box=$('suggestions');
  selected=found.length===1?found[0]:null;
  if(!q.trim()||!found.length){box.classList.remove('show');box.innerHTML='';return}
- box.innerHTML=found.map((c,i)=>`<button class="suggestion" onclick="chooseCard(${i})"><span><b>${c.id}</b>：${esc(c.name)}</span><span>${badge(c.rarity)}</span></button>`).join('');
+ box.innerHTML=found.map((c,i)=>`<button class="suggestion" onclick="chooseCard(${i})"><span><b>${c.id}</b>:${esc(c.name)}</span><span>${badge(rarOf[c.id+'|'+c.name+'|'+(c.star?1:0)]||c.rarity)}</span></button>`).join('');
  box.classList.add('show');
  window.currentMatches=found;
 }
-function chooseCard(i){selected=window.currentMatches[i];$('cardSearch').value=selected.id+'：'+selected.name;$('suggestions').classList.remove('show')}
+function chooseCard(i){selected=window.currentMatches[i];$('cardSearch').value=selected.id+':'+selected.name+(selected.star?' PR★':'');$('suggestions').classList.remove('show')}
 function addSelected(){
  const q=$('cardSearch').value.trim();
  if(!q)return;
  let c=selected;
  if(!c){const found=searchCards(q);if(found.length===1)c=found[0];else if(found.length>1){updateSuggestions();return}}
  if(!c){alert('カード番号か名前を確認してね。');return}
- histories[currentSide].push({id:c.id,name:c.name});
+ histories[currentSide].push({id:c.id,name:c.name,star:!!c.star});
  $('cardSearch').value='';selected=null;$('suggestions').classList.remove('show');render();
 }
 $('cardSearch').addEventListener('input',updateSuggestions);
@@ -286,7 +306,7 @@ function nextRare(slots,last){const out=[];for(let i=last+1;i<slots.length;i++)i
 
 function render(){
  const hist=histories[currentSide];$('sideTitle').textContent=currentSide==='right'?'右シリンダー':'左シリンダー';$('inputCount').textContent=hist.length+'枚入力済み';
- $('historyChips').innerHTML=hist.map((c,i)=>`<span class="chip">${c.id}：${esc(c.name)}<button onclick="removeCard(${i})">×</button></span>`).join('')||'<span class="note">まだカードが入力されていません。</span>';
+ $('historyChips').innerHTML=hist.map((c,i)=>`<span class="chip">${c.id}:${esc(c.name)}${c.star?' PR★':''}<button onclick="removeCard(${i})">×</button></span>`).join('')||'<span class="note">まだカードが入力されていません。</span>';
  if(!hist.length){$('candidateCount').textContent='入力待ち';$('results').className='empty';$('results').textContent='カードを入力すると、候補配列と次の高レア枠を表示します。';return}
  const ranked=Object.entries(arrays).map(([no,slots])=>({no,slots,match:bestMatch(slots,hist)})).filter(x=>x.match).sort((a,b)=>a.match.gaps-b.match.gaps||Number(a.no)-Number(b.no));
  $('candidateCount').textContent=ranked.length+'件';
@@ -299,15 +319,15 @@ function render(){
       <strong>No.${x.no}</strong>
       <span class="matchtype ${m.gaps?'gap':''}">${m.gaps===0?' 連続一致':'順番一致・間に'+m.gaps+'枠'}</span>
     </div>
-    <div class="meta">${hist.length}枚が一致 ／ 現在地：${m.last+1}枠目${ov!==null?'（矢印で移動）':''}</div>
-    <div class="tap-hint"> タップしてこの配列の現在位置＆全100枠を見る</div>
+    <div class="meta">${hist.length}枚が一致 / 現在位置:${m.last+1}枠目</div>
+    <div class="tap-hint">タップでこの配列の現在位置&全カードを見る</div>
     <div class="rares">
       <b>この先の高レア枠</b>
       ${rare.length?rare.map(r=>{
         const optHtml = r.slot.options.map(o=>{
           const img = getCardImagePath(o.id, o.star);
           const imgTag = img ? `<img src="${img}" class="card-img-thumb" alt="${esc(o.name)}">` : '';
-          return `<div class="rare-opt">${imgTag}<span>${o.star?'★ ':''}${o.id}：${esc(o.name)}</span></div>`;
+          return `<div class="rare-opt">${imgTag}<span>${o.star?'PR★ ':''}${o.id}:${esc(o.name)}</span></div>`;
         }).join('');
         return `<div class="rareline rarity-${r.slot.rarity}">
           <span class="distance">あと${r.distance}枚</span>
@@ -330,7 +350,7 @@ function saveCurrentHistory() {
     alert('保存するカードが入力されていません。');
     return;
   }
-  const name = prompt('保存する名前を入力してください（例：11/2 右シリンダー）', new Date().toLocaleString() + ' ' + (currentSide==='right'?'右':'左'));
+  const name = prompt('保存する名前を入力してください(例:11/2 右シリンダー)', new Date().toLocaleString() + ' ' + (currentSide==='right'?'右':'左'));
   if (!name) return;
 
   const saved = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
@@ -363,24 +383,32 @@ function renderSavedList() {
   const saved = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
   const container = document.getElementById('savedListContainer');
   if (!container) return;
-  
   if (saved.length === 0) {
     container.innerHTML = '<div class="empty">保存された配列はありません。</div>';
     return;
   }
-
-  container.innerHTML = saved.map((item, idx) => `
-    <div class="saved-item">
+  const last = saved.length - 1;
+  container.innerHTML = saved.map((item, idx) => ({item, idx})).reverse().map(({item, idx}) => `
+    <div class="saved-item${idx===last?' is-new':''}">
       <div>
-        <strong>${esc(item.name)}</strong>
-        <div class="meta">${item.side==='right'?'右':'左'}シリンダー / ${item.data.length}枚</div>
+        <strong><span class="saved-no">${idx+1}</span>${esc(item.name)}${idx===last?'<span class="new-tag">NEW</span>':''}</strong>
+        <div class="meta">${item.side==='right'?'右':'左'}シリンダー / ${item.data.length}枚${item.ed?' / 第'+item.ed+'弾':''}</div>
       </div>
       <div class="saved-item-actions">
+        <button class="btn-action load" onclick="addSavedToDb(${idx})">追加</button>
         <button class="btn-action load" onclick="loadHistory(${idx})">読込</button>
         <button class="btn-action delete" onclick="deleteHistory(${idx})">削除</button>
       </div>
     </div>
   `).join('');
+}
+
+function addSavedToDb(idx) {
+  const item = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]')[idx];
+  if (!item) return;
+  const e = item.ed || ($('editionSelect') ? $('editionSelect').value : '1') || '1';
+  const r = window.sendObsData ? sendObsData(item.side, item.data, e) : '';
+  alert(r==='locked' ? '第'+e+'弾は配列が確定済みのため、データベースには追加しません。' : r==='dup' ? '同じ並びはすでにデータベースに追加済みです。' : 'データベースに追加しました(推定)。');
 }
 
 // === スクロール・ナビゲーション機能 ===
@@ -448,12 +476,12 @@ function showArray(n, highlightIndex = -1){
  const slotsHtml = slots.map((s, idx)=>{
    const isCurrent = (idx === highlightIndex);
    const currentClass = isCurrent ? 'current-pos' : '';
-   const currentBadge = isCurrent ? `<div class="current-pos-badge">★ 現在地（${idx+1}枠目）</div>` : '';
+   const currentBadge = isCurrent ? `<div class="current-pos-badge">★ 現在位置(${idx+1}枠目)</div>` : '';
    
    const optList = s.options.length ? s.options.map(o=>{
      const img = getCardImagePath(o.id, o.star);
      const imgTag = img ? `<img src="${img}" class="card-img-slot" alt="${esc(o.name)}">` : '';
-     return `<div class="slotopt">${imgTag}<span class="opt-text">${o.star?'★ ':''}${o.id}：${esc(o.name)}</span></div>`;
+     return `<div class="slotopt">${imgTag}<span class="opt-text">${o.star?'PR★ ':''}${o.id}:${esc(o.name)}</span></div>`;
    }).join('') : '<span class="meta">カード名未記載</span>';
 
    return `<div id="slot-${idx}" class="slot rarity-${s.rarity} ${s.options.length?'':'emptySlot'} ${currentClass}">
@@ -467,7 +495,7 @@ function showArray(n, highlightIndex = -1){
  $('arrayDetail').innerHTML=`
    <div class="arrayhead" style="margin-top:20px;">
      <h2>No.${n} 全100枠配列表</h2>
-     ${highlightIndex>=0 ? `<span class="badge" style="background:#e85b91;color:#fff;">現在地: ${highlightIndex+1}枠目</span>` : ''}
+     ${highlightIndex>=0 ? `<span class="badge" style="background:#e85b91;color:#fff;">現在位置:${highlightIndex+1}枠目</span>` : ''}
    </div>
    <div class="slotlist">${slotsHtml}</div>
  `;

@@ -6,12 +6,13 @@ function allow(){document.documentElement.classList.remove("gp");var g=document.
 function box(h){var g=document.createElement("div");g.id="gate";g.innerHTML="<div>"+h+"</div>";document.documentElement.appendChild(g)}
 async function sha(t){var b=await crypto.subtle.digest("SHA-256",new TextEncoder().encode(C.salt+t));return Array.from(new Uint8Array(b)).map(function(x){return x.toString(16).padStart(2,"0")}).join("")}
 async function init(){
- if(C.mode==="open"||!(window.crypto&&crypto.subtle))return allow();
+ if(!(window.crypto&&crypto.subtle))return allow();
  try{
   var m=location.hash.match(/owner=([^&]+)/);
   if(m&&await sha("owner:"+decodeURIComponent(m[1]))===C.ownerHash){localStorage.setItem(K+"_owner",C.ownerHash);history.replaceState(null,"",location.pathname+location.search)}
   if(localStorage.getItem(K+"_owner")===C.ownerHash)return allow();
-  if(C.mode==="closed")return box("<h2>🔒</h2><p style='color:#333'>"+(C.closedMessage||"")+"</p>");
+  if(C.mode==="open")return allow();
+  if(C.mode==="closed")return box("<h2>&#128274;</h2><p style='color:#333'>"+(C.closedMessage||"")+"</p>");
   if(localStorage.getItem(K)===C.codeHash)return allow();
  }catch(e){}
  box("<h2>アクセスコード</h2><input id='gc' type='password' autocomplete='off' placeholder='コードを入力'><p id='ge'></p><button id='gb'>開く</button>");
