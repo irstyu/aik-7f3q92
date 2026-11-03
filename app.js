@@ -119,4 +119,9 @@ var ti=window.toggleImages;window.toggleImages=function(){
  $('maAdd').onclick=function(){var n=parseInt($('ma1').value,10);if(!(n>0)){alert('カード番号を入力してください。');return}
   histories[currentSide].push({id:n,name:$('ma2').value.trim(),rarity:$('ma3').value});$('ma1').value='';$('ma2').value='';render()};
  var se=$('editionSelect');if(se)se.addEventListener('change',sync);setTimeout(sync,0)})();
+
+// ===== 更新の確認 =====
+(function(){var lg=document.querySelector('.legal');
+ if(lg){var p=document.createElement('p');p.textContent='v4.0';lg.appendChild(p)}
+ if(!lg||!document.getElementById('resImgBtn')){var b=document.createElement('div');b.style.cssText='background:#c0392b;color:#fff;padding:10px 14px;font-size:13px;text-align:center';b.textContent='index.html が最新ではありません。GitHubで index.html をアップロードし直してください。';document.body.insertBefore(b,document.body.firstChild)}})();
 })();
