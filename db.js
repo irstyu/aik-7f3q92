@@ -1,6 +1,6 @@
 // 配列データベース（ブラウザ内保存）。初期データ(arrays)は読み取り専用で、書き換えません。
 (function(){
-var VER='3.6',KEY='aikatsu_db_v1',CERT={confirmed:'確認済み',estimated:'推定',unknown:'不明'},MARK={confirmed:'確',estimated:'推',unknown:'－'};
+var VER='3.7',KEY='aikatsu_db_v1',CERT={confirmed:'確認済み',estimated:'推定',unknown:'不明'},MARK={confirmed:'確',estimated:'推',unknown:'－'};
 var RAR=['','N','PR','ER','PAR'],SIDE={'':'未記録',left:'左シリンダー',right:'右シリンダー',unknown:'不明'},RN={N:'N（ノーマル）',PR:'PR（プレミアムレア）',ER:'ER（アンコールレア）',PAR:'PAR（パラレル）'};
 var db=load(),ed='1',arr='1',$=function(i){return document.getElementById(i)};
 function load(){try{var d=JSON.parse(localStorage.getItem(KEY));if(d&&d.slots){if(!d.seed1){Object.keys(d.slots).forEach(function(x){if(x.indexOf('1-')===0)delete d.slots[x]});d.seed1=true}if(d.editions&&d.editions['1'])d.editions['1'].locked=true;return d}}catch(e){}
@@ -21,7 +21,7 @@ var css=document.createElement('style');css.textContent=
 '.dbsheet label{display:block;margin-top:8px;font-size:14px}.dbsheet input,.dbsheet select{width:100%;font-size:17px;padding:11px;border-radius:10px;border:1px solid var(--line)}.dbsheet .row{display:flex;gap:8px;margin-top:12px}.dbsheet .row button{flex:1;padding:14px;font-size:16px;border-radius:10px;border:0;background:var(--accent);color:#fff}.dbsheet .row .g{background:#e9ecf3;color:#333}.dbsheet .row .d{background:#d9534f}';
 document.head.appendChild(css);
 var v=document.createElement('section');v.id='dbView';v.className='view';
-v.innerHTML='<div class="arrayhead"><button class="back" id="dbBack">← 戻る</button><h2>配列データベース <small style="color:#888;font-size:12px">v3.6</small></h2></div><div class="dbbar"><select id="dbEd"></select><select id="dbArr"></select></div><div id="dbProg" class="dbprog"></div><div id="dbGrid" class="dbgrid"></div><div id="dbObs"></div>'+
+v.innerHTML='<div class="arrayhead"><button class="back" id="dbBack">← 戻る</button><h2>配列データベース <small style="color:#888;font-size:12px">v3.7</small></h2></div><div class="dbbar"><select id="dbEd"></select><select id="dbArr"></select></div><div id="dbProg" class="dbprog"></div><div id="dbGrid" class="dbgrid"></div><div id="dbObs"></div>'+
 '<div class="dbbar" style="margin-top:14px"><button id="dbAddEd">＋新しい弾</button><button id="dbAddArr">＋新しい配列</button></div><div class="dbprog"><b>バックアップ</b><div id="dbBk"></div><div class="dbbar"><button id="dbExp"> 書き出し</button><button id="dbImp"> 復元（追加）</button></div><input type="file" id="dbFile" accept=".json,application/json" style="display:none"></div>';
 document.querySelector('.view').parentNode.appendChild(v);
 var dbY=0;function show(on){if(on){dbY=window.scrollY;var s0=selEd();if(db.editions[s0]){ed=s0;arr='1'}}document.querySelectorAll('.view').forEach(function(x){x.classList.remove('active')});(on?v:$('searchView')).classList.add('active');if(window.toggleFab)toggleFab(false);if(on)draw();window.scrollTo(0,on?0:dbY)}
@@ -79,12 +79,9 @@ function chains(list){var c=list.map(function(x){return x.cards.slice()}),M=3,go
     if(ok){c[i]=a.concat(b.slice(n));c.splice(j,1);go=true;break outer}}}}
  return c.sort(function(x,y){return y.length-x.length})}
 function drawObs(){var o=$('dbObs');if(!o)return;if(db.editions[ed].locked){o.innerHTML='';return}
- db.obsSeq=db.obsSeq||[];var L=db.obsSeq.filter(function(x){return x.ed===ed}),h='<div class="dbprog"><b>観測した並び</b>（'+L.length+'件）<div class="dbbar"><button id="ob1">入力中の左シリンダーを保存</button><button id="ob2">入力中の右シリンダーを保存</button></div><div class="dbbar"><button id="ob4">この配列の推定を確認済みにする</button></div>';
+ db.obsSeq=db.obsSeq||[];var L=db.obsSeq.filter(function(x){return x.ed===ed}),h='<div class="dbprog"><b>観測した並び</b>（'+L.length+'件）<br><small>並びの追加は、トップページの「保存」から行います。</small><div class="dbbar"><button id="ob4">この配列の推定を確認済みにする</button></div>';
  if(L.length){h+='<b>並び順の推定</b><br><small>3枚以上重なる観測どうしを連結します。推定のため、確認済みにはなりません。</small>'+chains(L).map(function(c,i){return'<div style="margin:8px 0">連なり'+(i+1)+'：'+c.length+'枚　<small>推定</small><br><small>'+c.map(function(x){return esc(x.id+':'+x.name)+(x.rarity&&x.rarity!=='N'?'['+x.rarity+']':'')}).join(' → ')+'</small><br><button class="ob-as" data-ci="'+i+'" style="margin-top:6px;padding:10px 14px;border-radius:10px;border:1px solid var(--line);background:#fff;font-size:15px">配列に当てはめる</button></div>'}).join('')+'<div class="dbbar"><button id="ob3">この弾の観測を全削除</button></div>'}
  o.innerHTML=h+'</div>';o.querySelectorAll('.ob-as').forEach(function(b){b.onclick=function(){assign(chains(L)[+b.dataset.ci])}});
- [['ob1','left'],['ob2','right']].forEach(function(p){$(p[0]).onclick=function(){var hs=(typeof histories!=='undefined'?histories:{})[p[1]]||[];if(!hs.length){alert('検索画面に入力中のカードがありません。');return}
-  var x={ed:ed,side:p[1],at:new Date().toISOString().slice(0,10),cards:obsCards(hs)};
-  if(db.obsSeq.some(function(y){return okey(y)===okey(x)})){alert('同じ観測がすでに保存されています。');return}db.obsSeq.push(x);save();draw()}});
  $('ob4').onclick=function(){var n=0;for(var s=1;s<=100;s++){var r=db.slots[k(ed,arr,s)];if(r&&r.cert==='estimated')n++}
   if(!n){alert('この配列に推定の記録はありません。');return}
   if(!confirm('配列 No.'+arr+' の推定 '+n+'枠を、確認済みにします。よろしいですか？'))return;
@@ -125,19 +122,12 @@ var mp=document.createElement('div');mp.id='dbMatch';var rts=document.querySelec
 // 保存先の選択
 var sv0=document.querySelector('.btn-action.save'),an=sv0&&sv0.parentNode;
 if(an&&an.parentNode){var sb=document.createElement('div');sb.id='stockBox';sb.className='dbprog';
- sb.innerHTML='<b>保存先</b><select id="dest" style="width:100%;font-size:16px;padding:11px;border-radius:10px;border:1px solid var(--line);margin:6px 0"><option value="saved">保存済み（配列確認・あとで呼び出す用）</option><option value="db">データベースに送信（データ収集用）</option><option value="both">両方</option></select><button id="stockBtn" class="btn-action save" style="width:100%;padding:14px;font-size:16px">保存・送信</button><div id="stockInfo" style="font-size:13px;color:#70778c;margin-top:6px"></div>';
+ sb.innerHTML='<b>保存先</b><select id="dest" style="width:100%;font-size:16px;padding:11px;border-radius:10px;border:1px solid var(--line);margin:6px 0"><option value="saved">保存済みデータに追加</option><option value="db">データベースに追加（配列情報登録用）</option><option value="both">保存済みデータ・データベースに追加</option></select><button id="stockBtn" class="btn-action save" style="width:100%;padding:14px;font-size:16px">保存</button><div id="stockInfo" style="font-size:13px;color:#70778c;margin-top:6px"></div>';
  an.parentNode.insertBefore(sb,an.nextSibling);an.style.display='none';
  $('stockBtn').onclick=function(){var m=$('dest').value;if(m==='db'){sendObs();return}
   var K=typeof STORAGE_KEY!=='undefined'?STORAGE_KEY:'aikatsu_array_saved_histories',n0=JSON.parse(localStorage.getItem(K)||'[]').length;
-  saveCurrentHistory();var n1=JSON.parse(localStorage.getItem(K)||'[]').length;if(m==='both'&&n1>n0)sendObs()}}
-// 確定していない弾用の手入力
-var sx=document.querySelector('.searchbox'),mf=document.createElement('div');mf.id='manualAdd';mf.className='dbprog';mf.style.display='none';
-var IS='font-size:16px;padding:11px;border:1px solid var(--line);border-radius:10px;flex:1;min-width:0';
-mf.innerHTML='<b>カードを手入力で追加</b><div class="dbbar"><input id="ma1" inputmode="numeric" placeholder="番号" style="'+IS+'"><input id="ma2" placeholder="カード名（不明なら空欄）" style="'+IS+'"></div><div class="dbbar"><select id="ma3">'+['N','PR','ER','PAR'].map(function(x){return'<option value="'+x+'">'+RN[x]+'</option>'}).join('')+'</select><button id="ma4">追加</button></div>';
-if(sx&&sx.parentNode)sx.parentNode.insertBefore(mf,sx.nextSibling);
-if($('ma4'))$('ma4').onclick=function(){var n=parseInt($('ma1').value,10);if(!(n>0)){alert('カード番号を入力してください。');return}
- var H=typeof histories!=='undefined'?histories:null;if(!H)return;H[currentSide].push({id:n,name:$('ma2').value.trim()||'名前不明',rarity:$('ma3').value});$('ma1').value='';$('ma2').value='';window.render()};
-function onEd(){var e=selEd(),lock=db.editions[e]&&db.editions[e].locked;mf.style.display=lock?'none':'block';if($('dest'))$('dest').value=lock?'saved':'db';try{window.render()}catch(x){}stockInfo()}
+  saveCurrentHistory();var sv=JSON.parse(localStorage.getItem(K)||'[]'),n1=sv.length;if(n1>n0){sv[n1-1].ed=selEd();localStorage.setItem(K,JSON.stringify(sv));if(window.renderSavedList)renderSavedList();if(m==='both')sendObs()}}}
+function onEd(){var e=selEd(),lock=db.editions[e]&&db.editions[e].locked;if($('dest'))$('dest').value=lock?'saved':'both';try{window.render()}catch(x){}stockInfo()}
 var es=$('editionSelect');if(es){syncEd();es.addEventListener('change',onEd)}
 var r0=window.render;if(r0)window.render=function(){var v=r0.apply(this,arguments);try{var e=selEd();
  if(!(db.editions[e]&&db.editions[e].locked)){$('results').className='empty';$('results').textContent='この弾はまだ配列が確定していません。入力した並びはデータベースに送信して蓄積できます。保存済みの並びと一致すると、ここに表示します。';$('candidateCount').textContent='未確定の弾'}
@@ -145,8 +135,6 @@ var r0=window.render;if(r0)window.render=function(){var v=r0.apply(this,argument
 onEd();
 
 window.dbIsLocked=function(e){return!!(db.editions[e]&&db.editions[e].locked)};
-window.dbStockCount=function(e){var o={left:0,right:0};(db.obsSeq||[]).forEach(function(x){if(x.ed===e&&o[x.side]!==undefined)o[x.side]++});return o};
-window.sendToDbStock=function(side,hs,e){db.obsSeq=db.obsSeq||[];if(!db.editions[e])db.editions[e]={label:'第'+e+'弾',arrays:12};
- var x={ed:e,side:side,at:new Date().toISOString().slice(0,10),cards:hs.map(function(c){var f=typeof cards!=='undefined'?cards.filter(function(q){return q.id===c.id&&q.name===c.name})[0]:null;return{id:c.id,name:c.name,rarity:f?cardRar(f):''}})};
- if(db.obsSeq.some(function(y){return okey(y)===okey(x)}))return'dup';db.obsSeq.push(x);save();return'ok'};
+window.sendObsData=function(side,data,e){if(db.editions[e]&&db.editions[e].locked)return'locked';db.obsSeq=db.obsSeq||[];if(!db.editions[e])db.editions[e]={label:'第'+e+'弾',arrays:12};
+ var x={ed:e,side:side,at:new Date().toISOString().slice(0,10),cards:obsCards(data)};if(db.obsSeq.some(function(y){return okey(y)===okey(x)}))return'dup';db.obsSeq.push(x);save();stockInfo();return'ok'};
 })();

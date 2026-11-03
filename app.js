@@ -52,30 +52,45 @@ function openCardList(){
     if(navigator.serviceWorker)p.push(navigator.serviceWorker.getRegistrations().then(function(r){return Promise.all(r.map(function(x){return x.unregister()}))}));
     return Promise.all(p)}).catch(function(){}).then(function(){location.reload()})}}
  // 番号は頭の数字が当てはまるものを表示
- var sc=window.searchCards;if(sc)window.searchCards=function(q){var s=String(q).trim();if(s&&!isNaN(s)){return cards.filter(function(c){return String(c.id).indexOf(s)===0}).slice(0,40)}return sc.apply(this,arguments)};
+ var sc=window.searchCards;if(sc)window.searchCards=function(q){var s=String(q).trim(),se=document.getElementById('editionSelect'),e=se?se.value:'1',open=window.dbIsLocked?!dbIsLocked(e):false;
+  if(open){return(s&&/^\d+$/.test(s))?[{id:parseInt(s,10),name:'',rarity:'',star:false}]:[]}
+  if(s&&!isNaN(s)){return cards.filter(function(c){return String(c.id).indexOf(s)===0}).slice(0,40)}return sc.apply(this,arguments)};
 })();
 
-// ===== 弾の選択（第2弾も選べる）／保存先の選択とデータ収集への送信 =====
-(function(){var sel=document.getElementById('editionSelect');
- if(sel&&sel.options[1]){sel.options[1].disabled=false;sel.options[1].textContent='第2弾'}
- var act=document.querySelector('.view-header-actions');if(!act||!window.saveCurrentHistory)return;
- var box=document.createElement('div');box.style.cssText='margin-top:14px;padding:12px;border:1px solid #e6e9f1;border-radius:12px;background:#fff';
- box.innerHTML='<div style="font-size:13px;color:#70778c;margin-bottom:6px">保存先</div><select id="saveDest" style="width:100%;font-size:16px;padding:11px;border-radius:10px;border:1px solid #d9dde8"><option value="saved">保存済みデータのみ（あとで呼び出す）</option><option value="db">データ収集のみ（データベースへ送信）</option><option value="both">両方に登録</option></select><div id="stockInfo" style="font-size:13px;color:#70778c;margin-top:8px"></div><div id="edNote" style="font-size:13px;color:#c0392b;margin-top:6px"></div>';
- act.parentNode.insertBefore(box,act);
- var btn=act.querySelector('button');if(btn)btn.textContent='保存・送信する';
- function info(){var e=sel?sel.value:'1',t=document.getElementById('stockInfo');
-  if(window.dbIsLocked&&dbIsLocked(e)){t.textContent='第1弾は確定済みのため、データ収集には送信されません。';return}
-  var n=window.dbStockCount?dbStockCount(e):null;t.textContent=n?'データ収集ストック：右 '+n.right+'件／左 '+n.left+'件（推定として内部に保存）':''}
- function edChange(){var e=sel?sel.value:'1';document.getElementById('saveDest').value=e==='1'?'saved':'db';
-  document.getElementById('edNote').textContent=e==='1'?'':'第'+e+'弾のカードデータはまだ登録されていません。入力できるカードは現在、第1弾のものです。';info()}
- if(sel)sel.addEventListener('change',edChange);edChange();
- var orig=window.saveCurrentHistory;
- window.saveCurrentHistory=function(){var e=sel?sel.value:'1',dest=document.getElementById('saveDest').value,hs=histories[currentSide];
-  if(!hs.length){alert('保存するカードが入力されていません。');return}
-  if(dest!=='saved'){
-   if(window.dbIsLocked&&dbIsLocked(e)){alert('第1弾は確定済みのため、データ収集には送信しません。「保存済みデータのみ」を選んでください。');return}
-   var r=window.sendToDbStock?sendToDbStock(currentSide,hs,e):'';
-   alert(r==='dup'?'同じ内容がすでにデータ収集に送信されています。':'データ収集に送信しました（推定として保存）。');info()}
-  if(dest!=='db')orig.apply(this,arguments)};
+
+// ===== 画像表示の切り替え（配列ごと／候補の小さい画像） =====
+(function(){
+ var cb=document.getElementById('showImageToggle'),lab=cb&&cb.closest('label'),KA='aikatsu_img_arr',KS='aikatsu_img_sug';
+ function get(k){try{return localStorage.getItem(k)}catch(e){return null}}function set(k,v){try{localStorage.setItem(k,v)}catch(e){}}
+ if(lab)lab.style.display='none';
+ if(cb&&get(KA)!==null){cb.checked=get(KA)==='1';toggleImages()}
+ var fab=document.getElementById('arrayFabContainer');
+ if(fab&&cb){var fb=document.createElement('button');fb.className='fab-btn';fb.type='button';
+  var lbl=function(){fb.textContent=cb.checked?'画像：オン':'画像：オフ'};lbl();
+  fb.onclick=function(){cb.checked=!cb.checked;toggleImages();set(KA,cb.checked?'1':'0');lbl()};fab.appendChild(fb)}
+ var st=document.createElement('style');st.textContent='body.hide-sug-img .sugimg{display:none}.sugimg{width:34px;height:auto;border-radius:5px;margin-right:8px;vertical-align:middle}';document.head.appendChild(st);
+ document.body.classList.toggle('hide-sug-img',get(KS)==='0');
+ var sx=document.querySelector('.searchbox');
+ if(sx&&sx.parentNode){var tb=document.createElement('button');tb.type='button';tb.style.cssText='margin:6px 0 0 auto;display:block;padding:6px 12px;font-size:13px;border-radius:99px;border:1px solid #d9dde8;background:#fff;color:#20243a';
+  var tl=function(){tb.textContent=document.body.classList.contains('hide-sug-img')?'候補の画像：オフ':'候補の画像：オン'};tl();
+  tb.onclick=function(){var h=document.body.classList.toggle('hide-sug-img');set(KS,h?'0':'1');tl()};sx.parentNode.insertBefore(tb,sx.nextSibling)}
+ var box=document.getElementById('suggestions');
+ if(box&&window.MutationObserver){new MutationObserver(function(){var items=box.querySelectorAll('.suggestion'),m=window.currentMatches||[];
+  items.forEach(function(el,i){if(el.dataset.img)return;el.dataset.img='1';var c=m[i];if(!c)return;var first=el.querySelector('span');if(!first)return;
+   if(c.name===''){first.innerHTML='<b>'+c.id+'</b>：番号のみ（名前・レアリティはあとで参照）'}
+   else{var p=window.getCardImagePath?getCardImagePath(c.id,c.star):'';if(p){var im=document.createElement('img');im.className='sugimg';im.src=p;im.loading='lazy';first.insertBefore(im,first.firstChild)}}})
+ }).observe(box,{childList:true})}
 })();
+// ===== 保存済みデータ：「追加」でデータベースへ =====
+(function(){var rs=window.renderSavedList;if(!rs)return;
+ window.renderSavedList=function(){rs.apply(this,arguments);
+  var K=typeof STORAGE_KEY!=='undefined'?STORAGE_KEY:'aikatsu_array_saved_histories',saved=[];try{saved=JSON.parse(localStorage.getItem(K)||'[]')}catch(e){}
+  document.querySelectorAll('#savedListContainer .saved-item').forEach(function(el,idx){var item=saved[idx],act=el.querySelector('.saved-item-actions');if(!item||!act||act.querySelector('.to-db'))return;
+   var mt=el.querySelector('.meta');if(mt&&item.ed)mt.textContent+=' / 第'+item.ed+'弾';
+   var b=document.createElement('button');b.type='button';b.className='btn-action load to-db';b.textContent='追加';b.title='データベースに追加';
+   b.onclick=function(){var s2=JSON.parse(localStorage.getItem(K)||'[]')[idx];if(!s2)return;var e=s2.ed||(document.getElementById('editionSelect')||{}).value||'1';
+    var r=window.sendObsData?sendObsData(s2.side,s2.data,e):'';
+    alert(r==='locked'?'第'+e+'弾は配列が確定済みのため、データベースには追加しません。':r==='dup'?'同じ並びはすでにデータベースに追加済みです。':'データベースに追加しました（推定）。')};
+   act.insertBefore(b,act.firstChild)})};
+ window.renderSavedList()})();
 })();
