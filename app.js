@@ -31,13 +31,51 @@ function openCardList(){
  '</style></head><body><header><h1>収録カード一覧</h1><div class="row"><select id="ed"><option>第1弾</option></select><select id="rf"><option value="">すべてのレアリティ</option><option value="N">N（ノーマル）</option><option value="PR">PR（プレミアムレア）</option><option value="ER">ER（アンコールレア）</option><option value="PAR">PAR（パラレル）</option></select></div>'+
  '<div class="row" style="margin-top:6px"><input id="q" placeholder="番号またはカード名で絞り込み"></div></header><div id="cnt"></div><div id="g"></div>'+
  '<script>var D='+json+',RN={N:"N",PR:"PR",ER:"ER",PAR:"PAR"},FN={N:"ノーマル",PR:"プレミアムレア",ER:"アンコールレア",PAR:"パラレル"};'+
+ 'function rng(a){a=a.filter(function(x,i,s){return s.indexOf(x)===i}).sort(function(p,q){return p-q});var o=[],i=0;while(i<a.length){var j=i;while(j+1<a.length&&a[j+1]===a[j]+1)j++;o.push(j-i>=2?a[i]+"-"+a[j]:(j>i?a[i]+", "+a[j]:""+a[i]));i=j+1}return o.join(", ")}'+
  'function esc(s){return String(s).replace(/[&<>"]/g,function(m){return{"&":"&amp;","<":"&lt;",">":"&gt;","\\"":"&quot;"}[m]})}'+
- 'function draw(){var q=document.getElementById("q").value.trim().toLowerCase(),f=document.getElementById("rf").value;var L=D.filter(function(c){return(!f||c.r.indexOf(f)>=0)&&(!q||String(c.id)===q||c.name.toLowerCase().indexOf(q)>=0)});'+
- 'document.getElementById("cnt").textContent=L.length+"種類";document.getElementById("g").innerHTML=L.map(function(c){return"<div class=c>"+(c.img?"<img loading=lazy src=\\""+c.img+"\\">":"")+"<div><b>No."+c.id+"</b> "+c.r.map(function(r){return"<span class=\\"t "+r+"\\">"+FN[r]+"</span>"}).join("")+"<br>"+esc(c.name)+"</div></div>"}).join("")}'+
+ 'function draw(){var q=document.getElementById("q").value.trim().toLowerCase(),f=document.getElementById("rf").value;var L=D.filter(function(c){return(!f||c.r.indexOf(f)>=0)&&(!q||(!isNaN(q)?String(c.id).indexOf(q)===0:c.name.toLowerCase().indexOf(q)>=0))});'+
+ 'document.getElementById("cnt").textContent=L.length+"種類"+(q&&!isNaN(q)?"　該当番号："+rng(L.map(function(c){return c.id})):"");document.getElementById("g").innerHTML=L.map(function(c){return"<div class=c>"+(c.img?"<img loading=lazy src=\\""+c.img+"\\">":"")+"<div><b>No."+c.id+"</b> "+c.r.map(function(r){return"<span class=\\"t "+r+"\\">"+FN[r]+"</span>"}).join("")+"<br>"+esc(c.name)+"</div></div>"}).join("")}'+
  '["q","rf"].forEach(function(i){document.getElementById(i).oninput=draw});draw();<\/script></body></html>';
  var w=window.open(URL.createObjectURL(new Blob([html],{type:'text/html'})),'_blank');if(!w)alert('新しいタブを開けませんでした。ポップアップを許可してください。');
 }
-(function(){var lb=document.getElementById('showImageToggle'),host=lb&&(lb.closest('label')||lb.parentNode);if(!host||!host.parentNode)return;
+(function(){
+ var bs=document.querySelectorAll('.view-options .badge'),bd=null;for(var i=0;i<bs.length;i++)if(bs[i].textContent.indexOf('100枠固定')>=0)bd=bs[i];
  var b=document.createElement('button');b.type='button';b.textContent='収録カード一覧';b.onclick=openCardList;
- b.style.cssText='margin:8px 0 0 10px;padding:8px 12px;font-size:13px;border-radius:10px;border:1px solid #d9dde8;background:#fff;color:#20243a';host.parentNode.insertBefore(b,host.nextSibling)})();
+ b.style.cssText='padding:6px 12px;font-size:13px;border-radius:99px;border:1px solid #d9dde8;background:#fff;color:#20243a';
+ if(bd)bd.parentNode.replaceChild(b,bd);else{var vo=document.querySelector('.view-options');if(vo)vo.appendChild(b)}
+ // タイトルと、タップで最新版に更新
+ document.title='アイカツ！アンコール 配列サーチ・データ収集';
+ var br=document.querySelector('.brand');if(br){var sm=br.querySelector('small');if(sm)sm.textContent='配列サーチ・カード配列データ収集';br.style.cursor='pointer';
+  br.onclick=function(){if(!confirm('最新版に更新しますか？（入力中の内容は残ります）'))return;
+   var fs=['index.html','db.js','app.js','gate.js','config.js','sw.js'].map(function(f){return fetch(f,{cache:'reload'}).catch(function(){})}),p=[];
+   Promise.all(fs).then(function(){if(window.caches)p.push(caches.keys().then(function(k){return Promise.all(k.map(function(x){return caches.delete(x)}))}));
+    if(navigator.serviceWorker)p.push(navigator.serviceWorker.getRegistrations().then(function(r){return Promise.all(r.map(function(x){return x.unregister()}))}));
+    return Promise.all(p)}).catch(function(){}).then(function(){location.reload()})}}
+ // 番号は頭の数字が当てはまるものを表示
+ var sc=window.searchCards;if(sc)window.searchCards=function(q){var s=String(q).trim();if(s&&!isNaN(s)){return cards.filter(function(c){return String(c.id).indexOf(s)===0}).slice(0,40)}return sc.apply(this,arguments)};
+})();
+
+// ===== 弾の選択（第2弾も選べる）／保存先の選択とデータ収集への送信 =====
+(function(){var sel=document.getElementById('editionSelect');
+ if(sel&&sel.options[1]){sel.options[1].disabled=false;sel.options[1].textContent='第2弾'}
+ var act=document.querySelector('.view-header-actions');if(!act||!window.saveCurrentHistory)return;
+ var box=document.createElement('div');box.style.cssText='margin-top:14px;padding:12px;border:1px solid #e6e9f1;border-radius:12px;background:#fff';
+ box.innerHTML='<div style="font-size:13px;color:#70778c;margin-bottom:6px">保存先</div><select id="saveDest" style="width:100%;font-size:16px;padding:11px;border-radius:10px;border:1px solid #d9dde8"><option value="saved">保存済みデータのみ（あとで呼び出す）</option><option value="db">データ収集のみ（データベースへ送信）</option><option value="both">両方に登録</option></select><div id="stockInfo" style="font-size:13px;color:#70778c;margin-top:8px"></div><div id="edNote" style="font-size:13px;color:#c0392b;margin-top:6px"></div>';
+ act.parentNode.insertBefore(box,act);
+ var btn=act.querySelector('button');if(btn)btn.textContent='保存・送信する';
+ function info(){var e=sel?sel.value:'1',t=document.getElementById('stockInfo');
+  if(window.dbIsLocked&&dbIsLocked(e)){t.textContent='第1弾は確定済みのため、データ収集には送信されません。';return}
+  var n=window.dbStockCount?dbStockCount(e):null;t.textContent=n?'データ収集ストック：右 '+n.right+'件／左 '+n.left+'件（推定として内部に保存）':''}
+ function edChange(){var e=sel?sel.value:'1';document.getElementById('saveDest').value=e==='1'?'saved':'db';
+  document.getElementById('edNote').textContent=e==='1'?'':'第'+e+'弾のカードデータはまだ登録されていません。入力できるカードは現在、第1弾のものです。';info()}
+ if(sel)sel.addEventListener('change',edChange);edChange();
+ var orig=window.saveCurrentHistory;
+ window.saveCurrentHistory=function(){var e=sel?sel.value:'1',dest=document.getElementById('saveDest').value,hs=histories[currentSide];
+  if(!hs.length){alert('保存するカードが入力されていません。');return}
+  if(dest!=='saved'){
+   if(window.dbIsLocked&&dbIsLocked(e)){alert('第1弾は確定済みのため、データ収集には送信しません。「保存済みデータのみ」を選んでください。');return}
+   var r=window.sendToDbStock?sendToDbStock(currentSide,hs,e):'';
+   alert(r==='dup'?'同じ内容がすでにデータ収集に送信されています。':'データ収集に送信しました（推定として保存）。');info()}
+  if(dest!=='db')orig.apply(this,arguments)};
+})();
 })();
