@@ -24,9 +24,20 @@ var st=document.createElement('style');st.textContent=
 document.head.appendChild(st);
 
 // ===== 検索: 番号は頭の数字で絞り込み、未確定の弾は番号のみ =====
-var sc=window.searchCards;if(sc)window.searchCards=function(q){var s=String(q).trim(),se=$('editionSelect'),e=se?se.value:'1',open=window.dbIsLocked?!dbIsLocked(e):false;
+function norm(s){return String(s).toLowerCase().replace(/[\u30a1-\u30f6]/g,function(c){return String.fromCharCode(c.charCodeAt(0)-0x60)}).replace(/\s+/g,'')}
+window.searchCards=function(q){var s=String(q).trim(),se=$('editionSelect'),e=se?se.value:'1',open=window.dbIsLocked?!dbIsLocked(e):false;
  if(open){return(s&&/^\d+$/.test(s))?[{id:parseInt(s,10),name:'',rarity:'',star:false}]:[]}
- if(s&&!isNaN(s)){return cards.filter(function(c){return String(c.id).indexOf(s)===0}).slice(0,40)}return sc.apply(this,arguments)};
+ if(!s)return[];
+ if(/^\d+$/.test(s))return cards.filter(function(c){return String(c.id).indexOf(s)===0}).slice(0,40);
+ var n=norm(s);return cards.filter(function(c){return norm(c.name).indexOf(n)>=0}).slice(0,20)};
+// 追加ボタン: 番号が一意ならすぐ反映(通常版を優先)
+var as0=window.addSelected;window.addSelected=function(){var q=$('cardSearch').value.trim();
+ if(q&&!selected){var open=window.dbIsLocked?!dbIsLocked(($('editionSelect')||{}).value||'1'):false;
+  if(!open){if(/^\d+$/.test(q)){var ex=cards.filter(function(c){return String(c.id)===q});if(ex.length)selected=ex.filter(function(c){return!c.star})[0]||ex[0]}
+   else{var nm=window.searchCards(q).filter(function(c){return norm(c.name)===norm(q)});if(nm.length)selected=nm.filter(function(c){return!c.star})[0]||nm[0]}}}
+ return as0.apply(this,arguments)};
+// 削除したときに位置が動かないようにする
+['deleteHistory','deleteAllHistories'].forEach(function(n){var f=window[n];if(!f)return;window[n]=function(){var y=window.scrollY,v=f.apply(this,arguments);window.scrollTo(0,y);requestAnimationFrame(function(){window.scrollTo(0,y)});return v}});
 
 // ===== タイトル: タップで最新版に更新 =====
 (function(){var sm=document.querySelector('header .mark'),br=sm&&sm.parentNode;if(!br)return;
@@ -36,16 +47,17 @@ var sc=window.searchCards;if(sc)window.searchCards=function(q){var s=String(q).t
   (async function(){try{var rs=await navigator.serviceWorker.getRegistrations();for(var i=0;i<rs.length;i++)await rs[i].unregister();var ks=await caches.keys();for(var j=0;j<ks.length;j++)await caches.delete(ks[j])}catch(e){}location.reload()})()}})();
 
 // ===== 収録カード一覧(新しいタブ) =====
+var CSCSS='.cs{position:relative;display:inline-block;min-width:0;vertical-align:middle}.cs-btn{display:flex;align-items:center;justify-content:space-between;gap:10px;width:100%;min-height:46px;padding:10px 14px;border:1px solid #d9dde8;background:#fff;border-radius:12px;font-size:15px;font-weight:600;color:#20243a;text-align:left}.cs-btn span{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.caret{flex:none;width:8px;height:8px;border-right:2px solid #8a90a3;border-bottom:2px solid #8a90a3;transform:rotate(45deg);margin-top:-4px}.cs.open .caret{transform:rotate(-135deg);margin-top:3px}.cs.open .cs-btn,.cs-btn:active{border-color:#e85b91;box-shadow:0 0 0 2px rgba(232,91,145,.18)}.cs-list{display:none;position:absolute;left:0;right:0;top:calc(100% + 6px);z-index:400;background:#fff;border:1px solid #e85b91;border-radius:12px;box-shadow:0 10px 26px rgba(32,36,58,.18);max-height:52vh;overflow:auto;padding:4px;min-width:150px}.cs.open .cs-list{display:block}.cs-item{display:block;width:100%;text-align:left;border:0;background:transparent;padding:12px;border-radius:9px;font-size:15px;color:#20243a}.cs-item.on{background:#fff0f6;font-weight:800}';
 function openCardList(){
  var rm={},seen={};
  Object.keys(arrays).forEach(function(n){arrays[n].forEach(function(sl){sl.options.forEach(function(o){var k=o.id+'|'+o.name+'|'+(o.star?1:0);if(!seen[k])seen[k]={id:o.id,name:o.name,star:!!o.star};(rm[k]=rm[k]||{})[sl.rarity]=1})})});
  var D=Object.keys(seen).map(function(k){var c=seen[k];c.r=c.star?['PAR']:Object.keys(rm[k]);var ip=getCardImagePath(c.id,c.star);c.img=ip?new URL(ip,location.href).href:'';return c}).sort(function(a,b){return a.id-b.id||a.star-b.star});
  var json=JSON.stringify(D).replace(/</g,'\\u003c');
- var page=`<!doctype html><html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex,nofollow"><title>収録カード一覧</title><style>
+ var page=`<!doctype html><html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex,nofollow"><title>収録カード一覧</title><link rel="icon" href="${new URL('favicon.png',location.href).href}"><link rel="apple-touch-icon" href="${new URL('apple-touch-icon.png',location.href).href}"><style>${CSCSS}
 body{margin:0;background:#f5f7fb;color:#20243a;font-family:system-ui,-apple-system,"Noto Sans JP",sans-serif}
 header{position:sticky;top:0;background:#fff;padding:12px;border-bottom:1px solid #e6e9f1;z-index:5}
 h1{font-size:19px;margin:0 0 10px;color:#e85b91;letter-spacing:.03em}
-.row{display:flex;gap:6px}.row>*{flex:1;min-width:0;font-size:16px;padding:10px;border:1px solid #d9dde8;border-radius:12px;background:#fff;color:#20243a}.row>*:focus{outline:0;border-color:#e85b91}
+.row{display:flex;gap:6px}.row>*{flex:1;min-width:0;font-size:16px;padding:10px;border:1px solid #d9dde8;border-radius:12px;background:#fff;color:#20243a}.row>*:focus{outline:0;border-color:#e85b91}.row>.cs{padding:0;border:0;background:transparent}
 #cnt{padding:10px 14px;font-size:14px;font-weight:700;color:#e85b91}
 #g{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;padding:0 10px 24px}
 .c{background:#fff;border-radius:12px;padding:6px;border:1px solid #e6e9f1}.c img{width:100%;border-radius:8px;display:block;cursor:zoom-in}
@@ -65,7 +77,7 @@ function draw(){var q=Q.value.trim().toLowerCase(),f=RF.value,L=D.filter(functio
  G.innerHTML=L.map(function(c){return '<div class="c">'+(c.img?'<img loading="lazy" src="'+c.img+'">':'')+'<div><b>'+c.id+'</b>'+c.r.map(function(r){return '<span class="t '+r+'">'+SN[r]+'</span>'}).join('')+'<br>'+esc(c.name)+'</div></div>'}).join('')}
 Q.oninput=draw;RF.onchange=draw;
 G.onclick=function(e){var i=e.target;if(i.tagName==='IMG'){OV.innerHTML='<img src="'+i.src+'">';OV.style.display='flex'}};
-OV.onclick=function(){OV.style.display='none'};draw();<\/script></body></html>`.replace('__DATA__',json);
+OV.onclick=function(){OV.style.display='none'};draw();<\/script><script>${'('+csInstall.toString()+')()'}<\/script></body></html>`.replace('__DATA__',json);
  var w=window.open(URL.createObjectURL(new Blob([page],{type:'text/html'})),'_blank');if(!w)alert('新しいタブを開けませんでした。ポップアップを許可してください。');
 }
 (function(){var cb=$('showImageToggle'),host=cb&&(cb.closest('label')||cb.parentNode);if(!host||!host.parentNode)return;
@@ -111,7 +123,7 @@ var ti=window.toggleImages;window.toggleImages=function(){
  var ex=(typeof cards!=='undefined'?cards.filter(function(c){return c.id===24})[0]:null);hint.textContent='例: 24  '+(ex?ex.name:'');
  sx.parentNode.insertBefore(hint,sx.nextSibling);
  var box=document.createElement('div');box.id='entryBox';box.style.display='none';
- box.innerHTML='<label class="fl">入力方法を選択</label><select id="entryMode"><option value="num">カード番号のみ(カード名・レアリティはカードデータ追加後参照)</option><option value="manual">カード番号・カード名・レアリティを手入力</option></select>'+
+ box.innerHTML='<label class="fl">入力方法を選択</label><select id="entryMode"><option value="num">カード番号を入力</option><option value="manual">カード番号・カード名・レアリティを入力</option></select>'+
  '<div id="manualBox" style="display:none"><div class="mrow"><input id="ma1" inputmode="numeric" placeholder="カード番号"><input id="ma2" placeholder="カード名(不明なら空欄)"></div><div class="mrow"><select id="ma3"><option value="N">N(ノーマル)</option><option value="PR">PR(プレミアムレア)</option><option value="ER">ER(アンコールレア)</option><option value="PAR">PR★(パラレル)</option></select><button type="button" id="maAdd" class="addbtn">追加</button></div></div>';
  sx.parentNode.insertBefore(box,sx);
  function sync(){var se=$('editionSelect'),e=se?se.value:'1',open=window.dbIsLocked?!dbIsLocked(e):false,man=open&&$('entryMode').value==='manual';
@@ -122,7 +134,7 @@ var ti=window.toggleImages;window.toggleImages=function(){
  var se=$('editionSelect');if(se)se.addEventListener('change',sync);setTimeout(sync,0)})();
 
 // ===== すべての選択欄を「下に一覧が開く」方式に統一 =====
-(function(){
+function csInstall(){
  function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')}
  function closeAll(){[].forEach.call(document.querySelectorAll('.cs.open'),function(w){w.classList.remove('open')})}
  document.addEventListener('click',closeAll);
@@ -139,10 +151,11 @@ var ti=window.toggleImages;window.toggleImages=function(){
   sel._cs=label;label()}
  window.enhanceSelects=function(){[].forEach.call(document.querySelectorAll('select'),function(s){if(!s.dataset.cs)enhance(s);else if(s._cs)s._cs()})};
  enhanceSelects();setInterval(enhanceSelects,400);
-})();
+}
+csInstall();
 
 // ===== 更新の確認 =====
 (function(){var lg=document.querySelector('.legal');
- if(lg){var p=document.createElement('p');p.textContent='v4.1';lg.appendChild(p)}
+ if(lg){var p=document.createElement('p');p.textContent='v4.2';lg.appendChild(p)}
  if(!lg||!document.getElementById('resImgBtn')){var b=document.createElement('div');b.style.cssText='background:#c0392b;color:#fff;padding:10px 14px;font-size:13px;text-align:center';b.textContent='index.html が最新ではありません。GitHubで index.html をアップロードし直してください。';document.body.insertBefore(b,document.body.firstChild)}})();
 })();
