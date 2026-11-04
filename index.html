@@ -175,6 +175,11 @@ button{border-radius:12px}.btn-action,.ghost,.arrbtn,.tab,.allbtn,.addbtn,.sugge
 .cs-item{display:block;width:100%;text-align:left;border:0;background:transparent;padding:12px;border-radius:9px;font-size:15px;color:#20243a;line-height:1.4}.cs-item.on{background:#fff0f6;font-weight:800}.cs-item:active{background:#ffe0ee}.cs-item.pk{color:#e85b91;font-weight:800}.cs-item.dis{opacity:.4}
 .destrow{align-items:stretch}.destrow .cs{flex:1}.destrow .cs-btn,.destrow #stockBtn{height:48px;min-height:48px}.destrow #stockBtn{padding:0 24px}
 .edition .cs{min-width:150px}.dbbar .cs{flex:1;min-width:110px}.mrow .cs{flex:1}
+
+/* === v6 === */
+.history{border:2px solid #e85b91;box-shadow:0 6px 18px rgba(232,91,145,.16)}.historytop b{font-size:1rem}
+.chips{flex-direction:column;flex-wrap:nowrap;gap:6px;max-height:226px;overflow-y:auto;-webkit-overflow-scrolling:touch;padding-right:2px}
+.chip{display:flex;align-items:center;gap:8px;padding:8px 10px;font-size:.85rem;flex:none}.chip .cn{color:#e85b91;font-weight:900;min-width:20px}.chip .cname{flex:1;min-width:0;word-break:break-all}.chip button{margin-left:auto;font-size:1.2rem}
 </style>
 
 </head>
@@ -221,7 +226,7 @@ button{border-radius:12px}.btn-action,.ghost,.arrbtn,.tab,.allbtn,.addbtn,.sugge
 </section>
 <section id="arraysView" class="view">
 <div class="arrayhead"><h2>全配列表</h2></div>
-<p class="note">No.1〜12はそれぞれ独立した100枠の配列です。枠内に複数の名前がある場合は、その中からランダムに1枚が出る枠として表示します。</p>
+<p class="note">No.1〜12はそれぞれ独立した100枠の配列です。枠内に複数の名前がある場合は、その中からランダムに1枚排出されます。</p>
 <div id="arrayGrid" class="arrgrid"></div>
 <div id="arrayDetail"></div>
 </section>
@@ -319,7 +324,7 @@ function nextRare(slots,last){const out=[];for(let i=last+1;i<slots.length;i++)i
 
 function render(){
  const hist=histories[currentSide];$('sideTitle').textContent=currentSide==='right'?'右シリンダー':'左シリンダー';$('inputCount').textContent=hist.length+'枚入力済み';
- $('historyChips').innerHTML=hist.map((c,i)=>`<span class="chip">${c.id}:${esc(c.name)}${c.star?' PR★':''}<button onclick="removeCard(${i})">×</button></span>`).join('')||'<span class="note">まだカードが入力されていません。</span>';
+ $('historyChips').innerHTML=hist.map((c,i)=>{const rr=c.star?'PAR':(rarOf[c.id+'|'+c.name+'|0']||c.rarity||'');return `<span class="chip"><span class="cn">${i+1}</span><span class="cname">${c.id}${c.name?':'+esc(c.name):''}</span>${rr?badge(rr):''}<button onclick="removeCard(${i})">×</button></span>`}).join('')||'<span class="note">まだカードが入力されていません。</span>';
  if(!hist.length){$('candidateCount').textContent='入力待ち';$('results').className='empty';$('results').textContent='カードを入力すると、候補配列と次の高レア枠を表示します。';return}
  const ranked=Object.entries(arrays).map(([no,slots])=>({no,slots,match:bestMatch(slots,hist)})).filter(x=>x.match).sort((a,b)=>a.match.gaps-b.match.gaps||Number(a.no)-Number(b.no));
  $('candidateCount').textContent=ranked.length+'件';
