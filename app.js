@@ -20,7 +20,6 @@ var st=document.createElement('style');st.textContent=
 '#backFloat{position:fixed;left:14px;bottom:calc(16px + env(safe-area-inset-bottom));width:70px;height:70px;border-radius:50%;background:#e85b91;color:#fff;border:0;box-shadow:0 6px 16px rgba(232,91,145,.45);z-index:150;display:none;align-items:center;justify-content:center;gap:2px;font-weight:800;font-size:12px;letter-spacing:.03em;padding:0}#backFloat .chev{width:9px;height:9px;margin-left:4px}'+
 '.mini{padding:6px 12px;font-size:13px;border:1px solid #d9dde8;background:#fff;border-radius:12px;color:#20243a;font-weight:700}.mini.on{background:#e85b91;border-color:#e85b91;color:#fff}'+
 'body.hide-sug-img .sugimg{display:none}.sugimg{width:34px;height:auto;border-radius:5px;margin-right:8px;vertical-align:middle}'+
-'.mode-opts{display:grid;gap:8px;margin-bottom:10px}.opt{text-align:left;padding:11px 12px;border:1px solid #d9dde8;background:#fff;border-radius:12px;font-size:13.5px;font-weight:700;color:#20243a;line-height:1.4}.opt.on{border-color:#e85b91;background:#fff0f6;color:#c0306b}'+
 '#manualBox{background:#fff;border:1px solid #e6e9f1;border-radius:14px;padding:10px;margin-bottom:10px}#manualBox .mrow{display:flex;gap:8px;margin-top:8px}#manualBox input,#manualBox select{flex:1;min-width:0;font-size:16px;padding:11px;border:1px solid #d9dde8;border-radius:10px;background:#fff}';
 document.head.appendChild(st);
 
@@ -86,7 +85,7 @@ var ti=window.toggleImages;window.toggleImages=function(){
  var fab=$('arrayFabContainer'),fb=null;
  if(fab&&cb){fb=document.createElement('button');fb.id='fabImg';fb.className='fab-btn';fb.type='button';fab.appendChild(fb)}
  var rb=$('resImgBtn'),sb=$('sugImgBtn');
- function lbl(){var on=!cb||cb.checked;if(fb)fb.textContent='画像 '+(on?'ON':'OFF');if(rb){rb.textContent='画像 '+(on?'ON':'OFF');rb.classList.toggle('on',on)}}
+ function lbl(){var on=!cb||cb.checked;if(fb){fb.textContent='画像 '+(on?'ON':'OFF');fb.classList.toggle('on',on)}if(rb){rb.textContent='画像 '+(on?'ON':'OFF');rb.classList.toggle('on',on)}}
  function flip(){cb.checked=!cb.checked;window.toggleImages();set(KA,cb.checked?'1':'0');lbl()}
  if(fb)fb.onclick=flip;if(rb)rb.onclick=flip;lbl();
  document.body.classList.toggle('hide-sug-img',get(KS)==='0');
@@ -95,7 +94,7 @@ var ti=window.toggleImages;window.toggleImages=function(){
  var box=$('suggestions');
  if(box&&window.MutationObserver){new MutationObserver(function(){var items=box.querySelectorAll('.suggestion'),m=window.currentMatches||[];
   [].forEach.call(items,function(el,i){if(el.dataset.img)return;el.dataset.img='1';var c=m[i];if(!c)return;var first=el.querySelector('span');if(!first)return;
-   if(c.name===''){first.innerHTML='<b>'+c.id+'</b>:番号のみ(名前・レアリティはあとで参照)'}
+   if(c.name===''){first.innerHTML='<b>'+c.id+'</b>'}
    else{var p=window.getCardImagePath?getCardImagePath(c.id,c.star):'';if(p){var im=document.createElement('img');im.className='sugimg';im.src=p;im.loading='lazy';first.insertBefore(im,first.firstChild)}}})
  }).observe(box,{childList:true})}
 })();
@@ -107,21 +106,43 @@ var ti=window.toggleImages;window.toggleImages=function(){
  bk.onclick=function(){var d=$('dbView');if(d&&d.classList.contains('active')&&window.dbShow)window.dbShow(false);else backToSearch()}})();
 
 // ===== 確定していない弾の入力方法 =====
-(function(){var sx=document.querySelector('.searchbox'),sg=$('suggestions');if(!sx||!sx.parentNode)return;var mode='num';
+(function(){var sx=document.querySelector('.searchbox'),sg=$('suggestions');if(!sx||!sx.parentNode)return;
+ var hint=document.createElement('div');hint.className='hint';
+ var ex=(typeof cards!=='undefined'?cards.filter(function(c){return c.id===24})[0]:null);hint.textContent='例: 24  '+(ex?ex.name:'');
+ sx.parentNode.insertBefore(hint,sx.nextSibling);
  var box=document.createElement('div');box.id='entryBox';box.style.display='none';
- box.innerHTML='<div class="mode-opts"><button type="button" class="opt on" data-m="num">カード番号のみ(カード名・レアリティはカードデータ追加後参照)</button><button type="button" class="opt" data-m="manual">カード番号・カード名・レアリティを手入力</button></div>'+
+ box.innerHTML='<label class="fl">入力方法を選択</label><select id="entryMode"><option value="num">カード番号のみ(カード名・レアリティはカードデータ追加後参照)</option><option value="manual">カード番号・カード名・レアリティを手入力</option></select>'+
  '<div id="manualBox" style="display:none"><div class="mrow"><input id="ma1" inputmode="numeric" placeholder="カード番号"><input id="ma2" placeholder="カード名(不明なら空欄)"></div><div class="mrow"><select id="ma3"><option value="N">N(ノーマル)</option><option value="PR">PR(プレミアムレア)</option><option value="ER">ER(アンコールレア)</option><option value="PAR">PR★(パラレル)</option></select><button type="button" id="maAdd" class="addbtn">追加</button></div></div>';
  sx.parentNode.insertBefore(box,sx);
- function sync(){var se=$('editionSelect'),e=se?se.value:'1',open=window.dbIsLocked?!dbIsLocked(e):false,man=open&&mode==='manual';
-  box.style.display=open?'block':'none';$('manualBox').style.display=man?'block':'none';sx.style.display=man?'none':'';if(man&&sg)sg.classList.remove('show');
-  [].forEach.call(box.querySelectorAll('.opt'),function(b){b.classList.toggle('on',b.dataset.m===mode)})}
- [].forEach.call(box.querySelectorAll('.opt'),function(b){b.onclick=function(){mode=b.dataset.m;sync()}});
+ function sync(){var se=$('editionSelect'),e=se?se.value:'1',open=window.dbIsLocked?!dbIsLocked(e):false,man=open&&$('entryMode').value==='manual';
+  box.style.display=open?'block':'none';$('manualBox').style.display=man?'block':'none';sx.style.display=man?'none':'';hint.style.display=open?'none':'';if(man&&sg)sg.classList.remove('show')}
+ $('entryMode').addEventListener('change',sync);
  $('maAdd').onclick=function(){var n=parseInt($('ma1').value,10);if(!(n>0)){alert('カード番号を入力してください。');return}
   histories[currentSide].push({id:n,name:$('ma2').value.trim(),rarity:$('ma3').value});$('ma1').value='';$('ma2').value='';render()};
  var se=$('editionSelect');if(se)se.addEventListener('change',sync);setTimeout(sync,0)})();
 
+// ===== すべての選択欄を「下に一覧が開く」方式に統一 =====
+(function(){
+ function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')}
+ function closeAll(){[].forEach.call(document.querySelectorAll('.cs.open'),function(w){w.classList.remove('open')})}
+ document.addEventListener('click',closeAll);
+ function enhance(sel){
+  if(sel.dataset.cs||!sel.parentNode)return;sel.dataset.cs='1';
+  var wrap=document.createElement('div');wrap.className='cs';var btn=document.createElement('button');btn.type='button';btn.className='cs-btn';
+  var list=document.createElement('div');list.className='cs-list';
+  sel.parentNode.insertBefore(wrap,sel);wrap.appendChild(btn);wrap.appendChild(list);wrap.appendChild(sel);sel.style.display='none';
+  function label(){var o=sel.options[sel.selectedIndex];btn.innerHTML='<span>'+esc(o?o.textContent:'')+'</span><i class="caret"></i>';btn.classList.toggle('pk',!!(o&&o.dataset&&o.dataset.pink))}
+  function build(){list.innerHTML='';[].forEach.call(sel.options,function(o,i){var it=document.createElement('button');it.type='button';
+   it.className='cs-item'+(i===sel.selectedIndex?' on':'')+(o.dataset&&o.dataset.pink?' pk':'')+(o.disabled?' dis':'');it.textContent=o.textContent;
+   it.onclick=function(e){e.stopPropagation();if(o.disabled)return;sel.selectedIndex=i;wrap.classList.remove('open');label();sel.dispatchEvent(new Event('change',{bubbles:true}))};list.appendChild(it)})}
+  btn.onclick=function(e){e.stopPropagation();var was=wrap.classList.contains('open');closeAll();if(!was){build();wrap.classList.add('open')}};
+  sel._cs=label;label()}
+ window.enhanceSelects=function(){[].forEach.call(document.querySelectorAll('select'),function(s){if(!s.dataset.cs)enhance(s);else if(s._cs)s._cs()})};
+ enhanceSelects();setInterval(enhanceSelects,400);
+})();
+
 // ===== 更新の確認 =====
 (function(){var lg=document.querySelector('.legal');
- if(lg){var p=document.createElement('p');p.textContent='v4.0';lg.appendChild(p)}
+ if(lg){var p=document.createElement('p');p.textContent='v4.1';lg.appendChild(p)}
  if(!lg||!document.getElementById('resImgBtn')){var b=document.createElement('div');b.style.cssText='background:#c0392b;color:#fff;padding:10px 14px;font-size:13px;text-align:center';b.textContent='index.html が最新ではありません。GitHubで index.html をアップロードし直してください。';document.body.insertBefore(b,document.body.firstChild)}})();
 })();
