@@ -1,7 +1,7 @@
 // 配列データベース(ブラウザ内保存)。初期データ(arrays)は読み取り専用で、書き換えません。
 (function(){
 function note(m){var y=window.scrollY;alert(m);window.scrollTo(0,y);requestAnimationFrame(function(){window.scrollTo(0,y)})}function ask(m){var y=window.scrollY,r=confirm(m);window.scrollTo(0,y);requestAnimationFrame(function(){window.scrollTo(0,y)});return r}
-var VER='4.1',KEY='aikatsu_db_v1',CERT={confirmed:'確認済み',estimated:'推定',unknown:'不明'},MARK={confirmed:'確',estimated:'推',unknown:'－'};
+var VER='4.2',KEY='aikatsu_db_v1',CERT={confirmed:'確認済み',estimated:'推定',unknown:'不明'},MARK={confirmed:'確',estimated:'推',unknown:'－'};
 var RAR=['','N','PR','ER','PAR'],SIDE={'':'未記録',left:'左シリンダー',right:'右シリンダー',unknown:'不明'},RN={N:'N(ノーマル)',PR:'PR(プレミアムレア)',ER:'ER(アンコールレア)',PAR:'PR★(パラレル)'};
 var db=load(),ed='1',arr='1',$=function(i){return document.getElementById(i)};
 function load(){try{var d=JSON.parse(localStorage.getItem(KEY));if(d&&d.slots){if(!d.seed1){Object.keys(d.slots).forEach(function(x){if(x.indexOf('1-')===0)delete d.slots[x]});d.seed1=true}if(d.editions&&d.editions['1'])d.editions['1'].locked=true;if(d.editions&&!d.seed2&&!d.editions['2'])d.editions['2']={label:'第2弾',arrays:12};d.seed2=true;return d}}catch(e){}
@@ -22,7 +22,7 @@ var css=document.createElement('style');css.textContent=
 '.dbsheet label{display:block;margin-top:8px;font-size:14px}.dbsheet input,.dbsheet select{width:100%;font-size:17px;padding:11px;border-radius:10px;border:1px solid var(--line)}.dbsheet .row{display:flex;gap:8px;margin-top:12px}.dbsheet .row button{flex:1;padding:14px;font-size:16px;border-radius:10px;border:0;background:var(--accent);color:#fff}.dbsheet .row .g{background:#e9ecf3;color:#333}.dbsheet .row .d{background:#d9534f}';
 document.head.appendChild(css);
 var v=document.createElement('section');v.id='dbView';v.className='view';
-v.innerHTML='<div class="arrayhead"><h2>配列データベース <small style="color:#888;font-size:12px">v4.1</small></h2></div><div class="dbbar"><select id="dbEd"></select><select id="dbArr"></select></div><div id="dbProg" class="dbprog"></div><div id="dbGrid" class="dbgrid"></div><div id="dbObs"></div>'+
+v.innerHTML='<div class="arrayhead"><h2>配列データベース <small style="color:#888;font-size:12px">v4.2</small></h2></div><div class="dbbar"><select id="dbEd"></select><select id="dbArr"></select></div><div id="dbProg" class="dbprog"></div><div id="dbGrid" class="dbgrid"></div><div id="dbObs"></div>'+
 '<div class="dbbar" style="margin-top:14px"><button id="dbAddEd">+新しい弾</button><button id="dbAddArr">+新しい配列</button></div><div class="dbbar"><button id="dbDelEd">この弾を削除</button><button id="dbDelArr">最後の配列を削除</button></div><div class="dbprog"><b>バックアップ</b><div id="dbBk"></div><div class="dbbar"><button id="dbExp"> 書き出し</button><button id="dbImp"> 復元(追加)</button></div><input type="file" id="dbFile" accept=".json,application/json" style="display:none"></div>';
 var lg=document.querySelector('.legal'),vp=document.querySelector('.view').parentNode;if(lg&&lg.parentNode===vp)vp.insertBefore(v,lg);else vp.appendChild(v);
 var dbY=0;function show(on){if(on){dbY=window.scrollY;var s0=selEd();if(db.editions[s0]){ed=s0;arr='1'}}document.querySelectorAll('.view').forEach(function(x){x.classList.remove('active')});(on?v:$('searchView')).classList.add('active');if(window.toggleFab)toggleFab(false);if(on)draw();window.scrollTo(0,on?0:dbY)}
@@ -123,8 +123,8 @@ var mp=document.createElement('div');mp.id='dbMatch';var rts=document.querySelec
 // 保存先の選択
 var sv0=document.querySelector('.btn-action.save'),an=sv0&&sv0.parentNode;
 if(an&&an.parentNode){var sb=document.createElement('div');sb.id='stockBox';sb.className='dbprog';
- sb.innerHTML='<b>入力データを保存</b><label class="fl" style="margin-top:8px">保存先を選択</label><div class="destrow"><select id="dest"><option value="saved">保存データに追加</option><option value="db">データベースに追加(配列情報登録用)</option><option value="both">保存データ・データベースに追加</option></select><button id="stockBtn" class="btn-action save">保存</button></div><div id="stockInfo" style="font-size:13px;color:#70778c;margin-top:6px"></div>';
- an.parentNode.insertBefore(sb,an.nextSibling);an.style.display='none';
+ sb.innerHTML='<label class="fl">保存先を選択</label><div class="destrow"><select id="dest"><option value="saved">保存データに追加</option><option value="db">データベースに追加(配列情報登録用)</option><option value="both">保存データ・データベースに追加</option></select><button id="stockBtn" class="btn-action save">保存</button></div><div id="stockInfo" style="font-size:13px;color:#70778c;margin-top:6px"></div>';
+ an.parentNode.insertBefore(sb,an.nextSibling);var sh=document.createElement('div');sh.className='resulttitle';sh.innerHTML='<h2>入力データを保存</h2>';an.parentNode.insertBefore(sh,sb);an.style.display='none';
  $('stockBtn').onclick=function(){var m=$('dest').value;if(m==='db'){sendObs();return}
   var K=typeof STORAGE_KEY!=='undefined'?STORAGE_KEY:'aikatsu_array_saved_histories',n0=JSON.parse(localStorage.getItem(K)||'[]').length;
   saveCurrentHistory();var sv=JSON.parse(localStorage.getItem(K)||'[]'),n1=sv.length;if(n1>n0){sv[n1-1].ed=selEd();localStorage.setItem(K,JSON.stringify(sv));if(window.renderSavedList)renderSavedList();if(m==='both')sendObs()}}}
