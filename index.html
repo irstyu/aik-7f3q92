@@ -6,7 +6,7 @@
 <meta name="theme-color" content="#e85b91">
 <meta name="robots" content="noindex,nofollow">
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Mochiy+Pop+One&family=Zen+Maru+Gothic:wght@500;700;900&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Hachi+Maru+Pop&family=Mochiy+Pop+One&family=Zen+Maru+Gothic:wght@500;700;900&display=swap" rel="stylesheet">
 <link rel="icon" type="image/png" href="favicon.png">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
 <link rel="manifest" href="manifest.webmanifest">
@@ -186,8 +186,8 @@ button{border-radius:12px}.btn-action,.ghost,.arrbtn,.tab,.allbtn,.addbtn,.sugge
 /* === v7: 公式サイト風 === */
 body{font-family:"Zen Maru Gothic","Hiragino Maru Gothic ProN","Yu Gothic",system-ui,sans-serif;background-color:#fff0f6;background-image:linear-gradient(135deg,rgba(255,255,255,.6) 25%,transparent 25%),linear-gradient(225deg,rgba(255,255,255,.6) 25%,transparent 25%),linear-gradient(315deg,rgba(255,255,255,.6) 25%,transparent 25%),linear-gradient(45deg,rgba(255,255,255,.6) 25%,transparent 25%);background-size:56px 56px;background-attachment:fixed}
 header.top{background:linear-gradient(180deg,#ffd0e5,#ffe9f3);border-bottom:3px solid #f6a9c9;position:relative}
-.topin{position:relative;padding-right:86px}.brand strong{font-family:"Mochiy Pop One","Zen Maru Gothic",sans-serif;letter-spacing:.04em}.view-options{display:none!important}
-.resulttitle h2,.stats strong{font-family:"Mochiy Pop One","Zen Maru Gothic",sans-serif;letter-spacing:.06em}
+.topin{position:relative;padding-right:86px}.brand strong{font-family:var(--hfont);letter-spacing:.04em}.view-options{display:none!important}
+.resulttitle h2,.stats strong{font-family:var(--hfont);letter-spacing:.06em}
 .history,.searchbox{background:#fff;border-radius:18px}
 .searchbox{border:2px solid #e85b91;box-shadow:0 6px 18px rgba(232,91,145,.16)}
 .cardresult.cont{border:2px solid #e85b91;background:#fff7fb;box-shadow:0 6px 18px rgba(232,91,145,.14)}
@@ -199,6 +199,22 @@ header.top{background:linear-gradient(180deg,#ffd0e5,#ffe9f3);border-bottom:3px 
 /* === v7 === */
 .searchbox{border:2px solid #e85b91!important;box-shadow:0 6px 18px rgba(232,91,145,.16)!important}
 #entryBox .cs{max-width:340px}
+
+/* === v9 === */
+:root{--hfont:"RiiCookie","Hachi Maru Pop","Mochiy Pop One","Zen Maru Gothic",sans-serif}
+@font-face{font-family:"RiiCookie";src:url("RiiCookie.woff2") format("woff2"),url("RiiCookie.ttf") format("truetype");font-display:swap}
+body{background-color:#fff6fa!important;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='60' height='104' viewBox='0 0 60 104'%3E%3Crect width='60' height='104' fill='%23fff6fa'/%3E%3Cpath d='M30 0L60 52L30 104L0 52Z' fill='%23ffeaf3'/%3E%3C/svg%3E")!important;background-size:60px 104px!important;background-attachment:fixed!important}
+.resulttitle h2,.stats strong,.arrayhead h2{font-family:var(--hfont)!important}
+.slotlist .slot{display:block!important;padding:5px!important;border:0!important;background:#fff!important;border-radius:14px!important;box-shadow:0 2px 8px rgba(32,36,58,.05)!important}
+.slot .slotin{display:flex;align-items:center;gap:10px;border:2px solid var(--sc,#e85b91);border-radius:11px;padding:9px 10px;background-color:var(--sbg,#fff);background-image:linear-gradient(var(--sg,rgba(232,91,145,.14)) 1px,transparent 1px),linear-gradient(90deg,var(--sg,rgba(232,91,145,.14)) 1px,transparent 1px);background-size:16px 16px}
+.slot.rarity-PR{--sc:#e2be4c;--sg:rgba(226,190,76,.3);--sbg:#fff9dd}.slot.rarity-ER{--sc:#8ed5e8;--sg:rgba(110,200,225,.3);--sbg:#effaff}.slot.rarity-R{--sc:#c3d3e6;--sg:rgba(150,175,205,.24);--sbg:#f8fbff}.slot.rarity-N{--sc:#d7dbe6;--sg:rgba(160,168,190,.22);--sbg:#fff}.slot.rarity-PAR{--sc:#ea8faf;--sg:rgba(234,143,175,.32);--sbg:#fff0f6}
+.slotlist .slot .slotnum{min-width:38px;text-align:center;font-weight:900}
+.slotlist .slot .slotopts{flex:1;display:flex;flex-direction:column;gap:8px;min-width:0}
+.slotlist .slot .slotopt{display:flex!important;flex-direction:row!important;align-items:center;gap:10px;background:transparent!important;border:0!important;padding:0!important;max-width:none!important}
+.slotopt .optbody{flex:1;min-width:0;display:flex;flex-direction:column;align-items:center;gap:5px;text-align:center}
+.cardresult{background:#fff!important;padding:6px!important;border:0!important;border-radius:16px!important}
+.cardresult .crin{border:2px solid #e85b91;border-radius:12px;padding:12px;background-color:#fff;background-image:linear-gradient(rgba(232,91,145,.13) 1px,transparent 1px),linear-gradient(90deg,rgba(232,91,145,.13) 1px,transparent 1px);background-size:16px 16px}
+.cardresult.cont .crin{border-width:3px;background-color:#fff7fb;box-shadow:0 6px 16px rgba(232,91,145,.18)}
 </style>
 
 </head>
@@ -235,16 +251,16 @@ header.top{background:linear-gradient(180deg,#ffd0e5,#ffe9f3);border-bottom:3px 
   <button class="btn-action save" onclick="saveCurrentHistory()"> 入力中の配列を保存</button>
 </div>
 <div style="margin-top: 20px;">
-  <div class="resulttitle"><h2>保存データ</h2><button class="mini danger" type="button" onclick="deleteAllHistories()">一括削除</button></div>
+  <div class="resulttitle"><h2>ほぞんデータ</h2><button class="mini danger" type="button" onclick="deleteAllHistories()">一括削除</button></div>
   <div id="savedListContainer" class="saved-data-list"></div>
 </div>
 
-<div class="resulttitle"><h2>配列候補</h2><div style="display:flex;align-items:center;gap:10px"><button id="resImgBtn" class="mini on" type="button">画像 ON</button><span id="candidateCount">入力待ち</span></div></div>
+<div class="resulttitle"><h2>はいれつこうほ</h2><div style="display:flex;align-items:center;gap:10px"><button id="resImgBtn" class="mini on" type="button">画像 ON</button><span id="candidateCount">入力待ち</span></div></div>
 <div id="results" class="empty">カードを入力すると、候補配列と次の高レア枠を表示します。</div>
 <div class="note">連続一致を最優先で表示し、間に未入力カードがある場合も順番が合えば候補に残します。複数のカード名がある枠は、1枠のランダム候補として判定します。</div>
 </section>
 <section id="arraysView" class="view">
-<div class="arrayhead"><h2>全配列表</h2></div>
+<div class="arrayhead"><h2>ぜんはいれつひょう</h2></div>
 <p class="note">No.1〜12はそれぞれ独立した100枠の配列です。枠内に複数の名前がある場合は、その中からランダムに1枚排出されます。</p>
 <div id="arrayGrid" class="arrgrid"></div>
 <div id="arrayDetail"></div>
@@ -364,7 +380,7 @@ function render(){
  $('results').className='';
  $('results').innerHTML=ranked.map(x=>{
   const m=Object.assign({},x.match), ov=window.advOf?advOf(x.no):null; if(ov!==null)m.last=ov; const rare=nextRare(x.slots,m.last);
-  return `<button type="button" class="cardresult${m.gaps===0?' cont':''}" onclick="viewArrayDetail('${x.no}', ${m.last})">
+  return `<button type="button" class="cardresult${m.gaps===0?' cont':''}" onclick="viewArrayDetail('${x.no}', ${m.last})"><div class="crin">
     <div class="rhead">
       <strong>No.${x.no}</strong>
       <span class="matchtype ${m.gaps?'gap':''}">${m.gaps===0?' 連続一致':'順番一致・間に'+m.gaps+'枠'}</span>
@@ -386,7 +402,7 @@ function render(){
         </div>`;
       }).join(''):'<div class="meta">この先に高レア枠はありません</div>'}
     </div>
-  </button>`;
+  </div></button>`;
  }).join('');
 }
 
@@ -551,20 +567,18 @@ function showArray(n, highlightIndex = -1){
    const optList = s.options.length ? s.options.map(o=>{
      const img = getCardImagePath(o.id, o.star);
      const imgTag = img ? `<img src="${img}" class="card-img-slot" alt="${esc(o.name)}">` : '';
-     return `<div class="slotopt">${imgTag}<span class="opt-text">${o.star?'PR★ ':''}${o.id}:${esc(o.name)}</span></div>`;
+     return `<div class="slotopt">${imgTag}<div class="optbody"><span class="opt-text">${o.star?'PR★ ':''}${o.id}:${esc(o.name)}</span>${badge(s.rarity)}</div></div>`;
    }).join('') : '<span class="meta">カード名未記載</span>';
 
    return `<div id="slot-${idx}" class="slot rarity-${s.rarity} ${s.options.length?'':'emptySlot'} ${currentClass}">
      ${currentBadge}
-     <span class="slotnum">${s.n}</span>
-     <div class="slotopts">${optList}</div>
-     ${badge(s.rarity)}
+     <div class="slotin"><span class="slotnum">${s.n}</span><div class="slotopts">${optList}</div>${s.options.length?'':badge(s.rarity)}</div>
    </div>`;
  }).join('');
 
  $('arrayDetail').innerHTML=`
    <div class="arrayhead" style="margin-top:20px;">
-     <h2>No.${n} 全100枠配列表</h2>
+     <h2>No.${n} 100わくはいれつひょう</h2>
      ${highlightIndex>=0 ? `<span class="badge" style="background:#e85b91;color:#fff;">現在位置:${highlightIndex+1}枠目</span>` : ''}
    </div>
    <div class="slotlist">${slotsHtml}</div>
