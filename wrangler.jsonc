@@ -1,0 +1,11 @@
+{
+  // Cloudflare の設定ファイル(このファイルは公開されません)
+  "name": "aikatsu-search",
+  "main": "worker.js",
+  "compatibility_date": "2026-11-01",
+  "assets": {
+    "directory": ".",
+    "binding": "ASSETS",
+    "html_handling": "none"
+  }
+}

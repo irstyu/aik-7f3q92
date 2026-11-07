@@ -2,8 +2,8 @@
 (function(){
 function inp(m){var y=window.scrollY,r=prompt(m);window.scrollTo(0,y);requestAnimationFrame(function(){window.scrollTo(0,y)});return r}
 function note(m){var y=window.scrollY;alert(m);window.scrollTo(0,y);requestAnimationFrame(function(){window.scrollTo(0,y)})}function ask(m){var y=window.scrollY,r=confirm(m);window.scrollTo(0,y);requestAnimationFrame(function(){window.scrollTo(0,y)});return r}
-var VER='5.0',KEY='aikatsu_db_v1',CERT={confirmed:'確認済み',estimated:'推定',unknown:'不明'},MARK={confirmed:'確',estimated:'推',unknown:'－'};
-var RAR=['','PR','ER','R','N','PAR'],SIDE={'':'未記録',left:'左シリンダー',right:'右シリンダー',unknown:'不明'},RN={PR:'PR(プレミアムレア)',ER:'ER(アンコールレア)',R:'R(レア)',N:'N(ノーマル)',PAR:'PR★(パラレル)'};
+var VER='6.1',KEY='aikatsu_db_v1',CERT={confirmed:'確認済み',estimated:'推定',unknown:'不明'},MARK={confirmed:'確',estimated:'推',unknown:'－'};
+var RAR=['','PR','R','N','ER'],SIDE={'':'未記録',left:'左シリンダー',right:'右シリンダー',unknown:'不明'},RN={PR:'PR(プレミアムレア)',ER:'ER(アンコールレア)',R:'R(レア)',N:'N(ノーマル)',PAR:'PR★(パラレル)'};
 var db=load(),ed='1',arr='1',$=function(i){return document.getElementById(i)};
 function load(){try{var d=JSON.parse(localStorage.getItem(KEY));if(d&&d.slots){if(!d.seed1){Object.keys(d.slots).forEach(function(x){if(x.indexOf('1-')===0)delete d.slots[x]});d.seed1=true}if(d.editions&&d.editions['1'])d.editions['1'].locked=true;if(d.editions&&!d.seed2&&!d.editions['2'])d.editions['2']={label:'第2弾',arrays:12};d.seed2=true;return d}}catch(e){}
  return{v:1,editions:{'1':{label:'第1弾',arrays:12,locked:true},'2':{label:'第2弾',arrays:12}},slots:{},lastBackup:null,seed1:true,seed2:true}}
@@ -32,7 +32,7 @@ function dbImg(id,star){var m=(typeof cardImages!=='undefined')&&cardImages[ed];
 function cardType(id){if(typeof CARD_INFO==='undefined')return'';for(var k in CARD_INFO.type)if(CARD_INFO.type[k].indexOf(id)>=0)return k;return''}
 function nArr(){return db.editions[ed].arrays}
 function draw(){
- $('dbEd').innerHTML=Object.keys(db.editions).map(function(e){return'<option value="'+e+'"'+(e===ed?' selected':'')+'>'+esc(db.editions[e].label)+'</option>'}).join('');
+ $('dbEd').innerHTML=Object.keys(db.editions).map(function(e){return'<option value="'+e+'"'+(edConf(e)?' data-pink="1"':'')+(e===ed?' selected':'')+'>'+esc(db.editions[e].label)+'</option>'}).join('');
  var o='';for(var a=1;a<=nArr();a++)o+='<option value="'+a+'"'+(arrConf(a)?' data-pink="1"':'')+(String(a)===arr?' selected':'')+'>配列 No.'+a+'</option>';$('dbArr').innerHTML=o;applyOwner();
  var c={confirmed:0,estimated:0,rar:0,unknown:0},g='';
  for(var s=1;s<=100;s++){var e=eff(arr,s),lab=e.name||(e.rarity?'':'未確認');
@@ -44,10 +44,10 @@ function draw(){
 $('dbEd').onchange=function(){ed=this.value;arr='1';draw()};$('dbArr').onchange=function(){arr=this.value;draw()};
 $('dbGrid').onclick=function(ev){var b=ev.target.closest('.dbc');if(b)sheet(+b.dataset.s)};
 function sheet(s){var e=eff(arr,s),r=e.rec||{},old=$('dbSheet');if(old)old.remove();
- if(db.editions[ed].locked){var ops=(base(arr,s)||{options:[]}).options,h=ops.map(function(o){var im=dbImg(o.id,o.star);return'<div style="display:flex;gap:12px;margin:10px 0;align-items:center">'+(im?'<img src="'+im+'" style="width:92px;border-radius:8px">':'')+'<div><b>No.'+o.id+'</b>'+(o.star?' PR★(パラレル)':'')+'<br>'+esc(o.name)+'</div></div>'}).join('')||'カード名未記載';var q=document.createElement('div');q.id='dbSheet';q.className='dbsheet';q.innerHTML='<div class="gridframe"><div class="gridin"><b>配列 No.'+arr+' '+s+'枠目</b><br>'+h+'<div>レアリティ:'+(RN[e.rarity]||'不明')+(function(){var k=ops.length?cardType(ops[0].id):'';return k&&typeof CARD_INFO!=='undefined'&&CARD_INFO.typeLabel?' / タイプ:'+CARD_INFO.typeLabel[k]:''})()+'</div><small>第1弾はPDF資料で確定済みのため、編集できません。</small></div></div><div class="row"><button class="g" id="x9">閉じる</button></div>';document.body.appendChild(q);$('x9').onclick=function(){q.remove()};return}
+ if(db.editions[ed].locked){var ops=(base(arr,s)||{options:[]}).options,h=ops.map(function(o){var im=dbImg(o.id,o.star);return'<div style="display:flex;gap:12px;margin:10px 0;align-items:center">'+(im?'<img src="'+im+'" style="width:92px;border-radius:8px">':'')+'<div><b>No.'+o.id+'</b>'+(o.star?' PR★(パラレル)':'')+'<br>'+esc(o.name)+'</div></div>'}).join('')||'カード名未記載';var q=document.createElement('div');q.id='dbSheet';q.className='dbsheet';q.innerHTML='<div class="gridframe"><div class="gridin"><b>配列 No.'+arr+' '+s+'枠目</b><br>'+h+'<div>レアリティ:'+(RN[e.rarity]||'不明')+(function(){var k=ops.length?cardType(ops[0].id):'';return k&&typeof CARD_INFO!=='undefined'&&CARD_INFO.typeLabel?'<br>タイプ:<span class="tyc ty-'+k+'">'+CARD_INFO.typeLabel[k]+'</span>':''})()+'</div><small>第1弾はPDF資料で確定済みのため、編集できません。</small></div></div><div class="row"><button class="g" id="x9">閉じる</button></div>';document.body.appendChild(q);$('x9').onclick=function(){q.remove()};return}
  var d=document.createElement('div');d.id='dbSheet';d.className='dbsheet';
  d.innerHTML='<b>配列 No.'+arr+' '+s+'枠目</b>'+(e.src==='base'?'<br><small>初期資料:'+esc(e.name||'カード名未記載')+'('+e.rarity+')。保存すると自分の記録として別に残り、初期資料は変わりません。</small>':'')+
- '<label>カード番号(入力すると候補が出ます)</label><input id="f0" inputmode="numeric" placeholder="例:24"><div id="f0r"></div><label>カード名(不明なら空欄)</label><input id="f1" value="'+esc(r.name||'')+'"><label>レアリティ</label><select id="f2">'+RAR.map(function(x){return'<option value="'+x+'"'+(x===(r.rarity||(e.src==='base'?e.rarity:''))?' selected':'')+'>'+(RN[x]||'不明')+'</option>'}).join('')+'</select>'+
+ '<label>カード番号(入力すると候補が出ます)</label><input id="f0" inputmode="numeric" placeholder="例:24"><div id="f0r"></div><label>カード名(不明なら空欄)</label><input id="f1" value="'+esc(r.name||'')+'"><label>レアリティ</label><div class="rarow"><select id="f2">'+RAR.map(function(x){return'<option value="'+x+'"'+(x===(r.rarity||(e.src==='base'?e.rarity:''))?' selected':'')+'>'+(RN[x]||'不明')+'</option>'}).join('')+'</select><button type="button" id="f2p" class="parbtn'+((r.rarity||(e.src==='base'?e.rarity:''))==='PAR'?' on':'')+'">PR★</button></div>'+
  '<label>情報の確実性</label><select id="f3">'+Object.keys(CERT).map(function(x){return'<option value="'+x+'"'+(x===(r.cert||(e.src==='base'?'confirmed':'unknown'))?' selected':'')+'>'+CERT[x]+'</option>'}).join('')+'</select>'+
  '<label>観測したシリンダー</label><select id="f4">'+Object.keys(SIDE).map(function(x){return'<option value="'+x+'">'+SIDE[x]+'</option>'}).join('')+'</select>'+
  '<div class="row"><button class="g" id="x0">閉じる</button>'+(e.rec?'<button class="d" id="x2">削除</button>':'')+'<button id="x1">保存</button></div>';
@@ -59,7 +59,8 @@ function sheet(s){var e=eff(arr,s),r=e.rec||{},old=$('dbSheet');if(old)old.remov
    b.innerHTML=(im?'<img src="'+im+'" style="width:56px;border-radius:6px">':'')+'<span>No.'+c.id+(c.star?' PR★(パラレル)':'')+'<br>'+esc(c.name)+'</span>';
    b.onclick=function(){$('f1').value=c.name;var r=cardRar(c);if(r)$('f2').value=r;box.innerHTML='<small>選択:'+esc(c.name)+'</small>'};box.appendChild(b)})};
  if($('x2'))$('x2').onclick=function(){if(ask('この枠の自分の記録を削除しますか？(初期資料は消えません)')){delete db.slots[k(ed,arr,s)];save();d.remove();draw()}};
- $('x1').onclick=function(){var n={name:$('f1').value.trim(),rarity:$('f2').value,cert:$('f3').value},key=k(ed,arr,s),ex=db.slots[key],cur=eff(arr,s);
+ $('f2p').onclick=function(){this.classList.toggle('on')};
+ $('x1').onclick=function(){var n={name:$('f1').value.trim(),rarity:($('f2p').classList.contains('on')?'PAR':$('f2').value),cert:$('f3').value},key=k(ed,arr,s),ex=db.slots[key],cur=eff(arr,s);
   if(ex&&ex.cert==='confirmed'&&((n.name&&ex.name&&n.name!==ex.name)||(n.rarity&&ex.rarity&&n.rarity!==ex.rarity))&&!ask('確認済みの情報と違います。変更しますか？'))return;
   if(!ex&&cur.src==='base'&&((n.name&&cur.name&&n.name!==cur.name)||(n.rarity&&cur.rarity&&n.rarity!==cur.rarity))&&!ask('初期資料と違います。自分の記録として別に保存しますか？'))return;
   var obs=(ex&&ex.obs)||[];obs.push({side:$('f4').value,at:new Date().toISOString().slice(0,10)});
@@ -126,7 +127,7 @@ var mp=document.createElement('div');mp.id='dbMatch';var rts=document.querySelec
 var sv0=document.querySelector('.btn-action.save'),an=sv0&&sv0.parentNode;
 if(an&&an.parentNode){var sb=document.createElement('div');sb.id='stockBox';sb.className='dbprog';
  sb.innerHTML='<label class="fl">保存先を選択</label><div class="destrow"><select id="dest"><option value="saved">保存データに追加</option><option value="db">配列データベースに追加(配列を登録する)</option><option value="both">保存データ・配列データベースに追加</option></select><button id="stockBtn" class="btn-action save">保存</button></div><div id="stockInfo" style="font-size:13px;color:#70778c;margin-top:6px"></div>';
- an.parentNode.insertBefore(sb,an.nextSibling);var sh=document.createElement('div');sh.className='resulttitle';sh.innerHTML='<h2>にゅうりょくデータをほぞん</h2>';an.parentNode.insertBefore(sh,sb);an.style.display='none';
+ an.parentNode.insertBefore(sb,an.nextSibling);var sh=document.createElement('div');sh.className='resulttitle';sh.innerHTML='<h2>入力データを保存</h2>';an.parentNode.insertBefore(sh,sb);an.style.display='none';
  $('stockBtn').onclick=function(){var m=$('dest').value;if(m==='db'){sendObs();return}
   var K=typeof STORAGE_KEY!=='undefined'?STORAGE_KEY:'aikatsu_array_saved_histories',n0=JSON.parse(localStorage.getItem(K)||'[]').length;
   saveCurrentHistory();var sv=JSON.parse(localStorage.getItem(K)||'[]'),n1=sv.length;if(n1>n0){sv[n1-1].ed=selEd();localStorage.setItem(K,JSON.stringify(sv));if(window.renderSavedList)renderSavedList();if(m==='both')sendObs()}}}
@@ -142,6 +143,7 @@ window.sendObsData=function(side,data,e){if(db.editions[e]&&db.editions[e].locke
  var x={ed:e,side:side,at:new Date().toISOString().slice(0,10),cards:obsCards(data)};if(db.obsSeq.some(function(y){return okey(y)===okey(x)}))return'dup';db.obsSeq.push(x);save();stockInfo();return'ok'};
 
 function isOwner(){var h=window.SITE_CONFIG&&SITE_CONFIG.ownerHash;try{return!!h&&localStorage.getItem('aikatsu_access_v1_owner')===h}catch(e){return false}}
+function edConf(e){var o=ed,ok=true;ed=e;for(var a=1;a<=db.editions[e].arrays&&ok;a++)ok=arrConf(a);ed=o;return ok}
 function arrConf(a){for(var s=1;s<=100;s++){var x=eff(a,s);if(!(x.cert==='confirmed'&&(x.name||x.rarity)))return false}return true}
 function applyOwner(){var on=isOwner();['dbAddEd','dbAddArr','dbDelEd','dbDelArr'].forEach(function(id){var b=$(id);if(b&&b.parentNode)b.parentNode.style.display=on?'':'none'});var e=$('dbExp');if(e&&e.parentNode&&e.parentNode.parentNode)e.parentNode.parentNode.style.display=on?'':'none'}
 ['dbAddEd','dbAddArr','dbExp','dbImp'].forEach(function(id){var f=$(id).onclick;$(id).onclick=function(){if(!isOwner()){note('この操作は管理者のみ可能です。');return}return f.apply(this,arguments)}});
