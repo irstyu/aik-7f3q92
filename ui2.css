@@ -21,7 +21,7 @@
 .cardresult.cont{border:3px solid #ee3f8e!important;box-shadow:0 0 0 4px rgba(238,63,142,.15),0 8px 22px rgba(238,63,142,.25)!important}
 
 /* BACK: MENUと同じ大きさ、普段は半透明でやさしく光る */
-#backFloat{width:56px!important;height:56px!important;font-size:10.5px!important;opacity:.55;transition:opacity .25s;animation:glowPulse 2.6s ease-in-out infinite}
+#backFloat{width:56px!important;height:56px!important;font-size:10.5px!important;opacity:.8;transition:opacity .25s;animation:glowPulse 2.6s ease-in-out infinite}
 #backFloat:active{opacity:1}
 
 /* 配列の続きボタンをしまったときの小さなタブ */
@@ -30,7 +30,7 @@
 
 /* 全配列表: 番号は丸、名前は画像の右、レアリティは名前の下 */
 .slot{grid-template-columns:44px 1fr auto!important}
-.slotnum{display:inline-flex!important;align-items:center;justify-content:center;width:34px;height:34px;border-radius:50%;font-size:.95rem!important;color:#20243a!important;background:#e9ebf2}
+.slotnum{display:inline-flex!important;align-items:center;justify-content:center;width:34px;height:34px;border-radius:50%;font-size:.95rem!important;color:#573647!important;background:#e9ebf2}
 .slot.rarity-N .slotnum{background:#e3e6ee}.slot.rarity-R .slotnum{background:#c6d9ee}.slot.rarity-PR .slotnum{background:#f3c942}.slot.rarity-ER .slotnum{background:#82d4ee}.slot.rarity-PAR .slotnum{background:#f28db4}
 .slotopt{display:flex!important;align-items:center;gap:10px;background:transparent!important;padding:4px 0!important}
 .slotopt .card-img-slot{width:64px;flex:none;border-radius:6px}
@@ -44,3 +44,102 @@
 #sheetBack{position:fixed;inset:0;z-index:955;background:rgba(32,36,58,.25);opacity:0;transition:opacity .28s}#sheetBack.show{opacity:1}
 .dbsheet{z-index:960!important}
 #lbx{position:fixed;inset:0;z-index:990;background:rgba(20,22,40,.82);display:flex;align-items:center;justify-content:center;padding:16px;animation:lbIn .28s ease}#lbx img{max-width:100%;max-height:100%;border-radius:12px}
+
+/* === 修正第1弾 === */
+/* F1: ヘッダーが見えなくなったら左上の丸アイコンをふわっと表示 */
+#homeFloat.show{opacity:1!important;pointer-events:auto!important;transform:none!important}
+/* F34: 右矢印の向き */
+.chev.r{transform:rotate(45deg);margin-right:3px}
+/* F32: くわしくさがすの選択一覧を切らない(開ききってから表示) */
+#moreBody.open.done .mbi{overflow:visible}
+/* F15: 現在位置のはっきりしたピンクの大外枠 */
+.slotlist .slot.current-pos{border:3px solid #e85b91!important}
+/* F14: 配列詳細(番号付き全配列表)の格子線と内側の枠を消す(確定) */
+#arrayDetail .slot .slotin{background-image:none!important;border:0!important}
+/* F17: 右側ボタンの白背景だけ半透明(文字はそのまま) */
+.fab-btn:not(.primary):not(.on){background:rgba(255,255,255,.6)!important}
+/* F18: 配列表のナンバーボタンは3列・角丸 */
+.arrgrid{grid-template-columns:repeat(3,1fr)!important;gap:8px!important}
+.arrbtn{border-radius:12px!important;padding:10px!important}
+/* F8: シリンダー選択の見出し: 文字ピンク・下線は紺 */
+#sideTitle{color:#ee3f8e!important;border-bottom-color:#573647!important}
+
+/* === 修正第2弾: 文字色・枠色 === */
+/* F9: 入力したカード欄の文字 */
+.chip{color:#ee3f8e}
+/* F10: 弾の選択の文字 */
+.edition .cs-btn,.edition .cs-btn span,.edition .cs-item{color:#ee3f8e!important}
+/* F11 / F40: 手入力フォームの文字と枠(通常の選択欄と同じ仕様) */
+#manualBox input,#manualBox .cs-btn,#manualBox .cs-btn span,#manualBox .cs-item{color:#ee3f8e!important}
+#manualBox input::placeholder{color:#ee3f8e;opacity:.55}
+#manualBox input,#manualBox .cs-btn{border:1.5px solid #ee3f8e!important}
+#manualBox input:focus{outline:0;box-shadow:0 0 0 2px rgba(232,91,145,.18)}
+/* F13: 配列候補のNo.・この先の高レア枠・件数はピンク(No.と高レア枠は白フチ) */
+.rhead strong,.rares b{color:#ee3f8e;text-shadow:-1px -1px 0 #fff,1px -1px 0 #fff,-1px 1px 0 #fff,1px 1px 0 #fff,0 -1px 0 #fff,0 1px 0 #fff,-1px 0 0 #fff,1px 0 0 #fff}
+#candidateCount{color:#ee3f8e!important}
+/* F25: カード詳細(下から出るパネル)の文字は全部ピンク。ボタン内の文字は現状のまま */
+.dbsheet,.dbsheet label,.dbsheet b,.dbsheet small,.dbsheet div:not(.row),.dbsheet input,.dbsheet select,.dbsheet .cs-btn,.dbsheet .cs-btn span,.dbsheet .cs-item{color:#ee3f8e!important}
+/* F40: カード詳細の入力欄の枠もピンク */
+.dbsheet input,.dbsheet select,.dbsheet .cs-btn{border:1.5px solid #ee3f8e!important}
+.dbsheet input:focus{outline:0;box-shadow:0 0 0 2px rgba(232,91,145,.18)}
+/* F26: 1〜100枠の中はピンク。PR/ER/PR★の表記だけ白 */
+.dbc,.dbc b,.dbc small{color:#ee3f8e!important}
+.dbc.r-PR .rr,.dbc.r-ER .rr,.dbc.r-PAR .rr{color:#fff;font-weight:800;text-shadow:0 0 3px rgba(32,36,58,.4)}
+/* F9: 入力したカード欄の見出しもピンク(S1) */
+.historytop b{color:#ee3f8e}
+/* F28: カード詳細の中には、100枠用のピンクの外側ぼかしを出さない(100枠側のF51はそのまま) */
+.dbsheet .gridframe{box-shadow:none!important}
+
+/* === 修正第3弾 === */
+/* S4: 中見出しプレート(ピンク背景#fe76b6+白抜き文字+角丸、公式風の二重縁) */
+.resulttitle h2,.arrayhead h2{display:inline-block;background:#fe76b6;color:#fff!important;border-radius:16px;padding:7px 22px;font-size:1.02rem;letter-spacing:.08em;box-shadow:0 0 0 3px #fff,0 0 0 5px #ee2b8f;margin:5px}
+/* 検索画面に残っていたグレーの枠・区切り線・文字をピンクに */
+.chip{border-color:#ee3f8e!important}.chip button{color:#ee3f8e!important}
+.rares{border-top-color:#f8a5c9!important}
+.suggestions{border-color:#ee3f8e!important}.suggestion{border-bottom-color:#f8a5c9!important}
+.empty{border-color:#f8a5c9!important}
+.ghost{color:#ee3f8e!important}
+.tab{color:#ee3f8e!important;border-color:#ee3f8e!important}.tab.active{color:#fff!important;border-color:transparent!important}
+.hint{color:#573647!important}
+/* F37: トップ画面の余白とフォント */
+main{padding-top:12px!important}
+.hero{margin:0 0 10px!important}.hero .eyebrow{margin:0!important;line-height:1.2}
+.hero h1{font-family:"Zen Maru Gothic","Hiragino Maru Gothic ProN","Yu Gothic",system-ui,sans-serif!important;font-weight:700!important;margin:2px 0!important;letter-spacing:0}
+.hero p{margin:2px 0!important}
+/* F3: メニューの多層枠(白い半透明→細いピンク→水色→内側の水色の線)と中央配置 */
+#menuOv{justify-content:center!important}
+.menupanel{position:relative;width:min(86vw,360px);box-sizing:border-box;padding:26px 14px 22px;background:rgba(255,255,255,.96);border:5px solid #8fd8f0;border-radius:30px;box-shadow:0 0 0 2px #ee3f8e,0 0 0 12px rgba(255,255,255,.55);display:flex;flex-direction:column;align-items:center;gap:6px}
+.menupanel::before{content:"";position:absolute;inset:7px;border:2px solid #8fd8f0;border-radius:22px;pointer-events:none}
+.menupanel nav,.menupanel .menuset{position:relative}.menupanel .menuset{margin-top:14px}
+/* F2: メニュー画面の「配列サーチに戻る」 */
+#menuBack{position:fixed;top:12px;left:12px;z-index:960;width:54px;height:54px;border-radius:50%;background:#fff;border:3px solid #ee3f8e;box-shadow:0 0 0 3px #fff,0 0 0 5px #f8a5c9,0 6px 14px rgba(232,63,140,.3);display:flex;align-items:center;justify-content:center;padding:0}
+/* F7: TOPボタン(カードリスト・配列データベース。右下) */
+.chev.u{transform:rotate(-45deg);margin-top:4px}
+.topfloat{position:fixed;right:14px;bottom:calc(16px + env(safe-area-inset-bottom));z-index:140;display:none;align-items:center;justify-content:center;gap:4px;width:104px;height:38px;padding:0 8px;border-radius:14px;border:1px solid #d9dde8;background:rgba(255,255,255,.6);color:#573647;font-family:inherit;font-size:12.5px;font-weight:700;letter-spacing:.04em;box-shadow:0 4px 14px rgba(32,36,58,.12);backdrop-filter:blur(6px)}
+.topfloat:active{transform:scale(.97)}
+/* F6: ヘルプ「?」 */
+.hwrap{position:relative;display:flex;align-items:center;gap:10px}
+.helpq{width:26px;height:26px;border-radius:50%;border:2px solid #ee3f8e;background:#fff;color:#ee3f8e;font-weight:900;font-size:15px;line-height:1;padding:0;display:inline-flex;align-items:center;justify-content:center;font-family:inherit}
+.helppop{position:absolute;left:0;top:calc(100% + 12px);z-index:300;width:min(78vw,300px);background:#fff;color:#573647;border:2px solid #ee3f8e;border-radius:14px;padding:10px 14px;font-size:13px;line-height:1.6;font-weight:600;box-shadow:0 8px 22px rgba(238,63,142,.22);animation:lbIn .18s ease}
+.helppop::before{content:"";position:absolute;top:-8px;left:var(--ax,40px);width:12px;height:12px;background:#fff;border-left:2px solid #ee3f8e;border-top:2px solid #ee3f8e;transform:rotate(45deg)}
+/* 下層ページ(カードリスト・仮置きページ)の共通ヘッダー(F33) */
+body.sub header.top{background:linear-gradient(180deg,#ffd0e5,#ffe9f3);border-bottom:3px solid #f6a9c5;position:relative}
+body.sub .topin{max-width:920px;margin:auto;padding:13px 86px 13px 18px;display:flex;align-items:center;gap:12px}
+body.sub .brand{display:flex;align-items:center;gap:10px;cursor:pointer}
+body.sub .mark{width:38px;height:38px;border-radius:12px;background:linear-gradient(145deg,#f28bb1,#df4f88);display:grid;place-items:center;color:#fff;font-weight:900;box-shadow:0 5px 12px #e85b9133}
+body.sub .brand strong{font-size:1rem;letter-spacing:.04em;font-family:var(--hfont);color:#573647}
+body.sub .brand small{display:block;color:#573647;font-size:.7rem;margin-top:1px}
+/* F30: カード詳細(配列データベース)の番号・名前・タイプ表記もタイプ色 */
+.dbsheet .tcol.ty-cute,.dbsheet .tcol.ty-cute b,.dbsheet .tyc.ty-cute{color:#ee3f8e!important}
+.dbsheet .tcol.ty-cool,.dbsheet .tcol.ty-cool b,.dbsheet .tyc.ty-cool{color:#2fa7d6!important}
+.dbsheet .tcol.ty-sexy,.dbsheet .tcol.ty-sexy b,.dbsheet .tyc.ty-sexy{color:#8e5fc0!important}
+.dbsheet .tcol.ty-pop,.dbsheet .tcol.ty-pop b,.dbsheet .tyc.ty-pop{color:#f08a1c!important}
+/* F62: 大見出しの余白は上下同じ(22px)・全ページ同じ位置。文字は濃いピンク */
+#pageTitle,h1{margin-top:22px!important;margin-bottom:22px!important;color:#ee3f8e!important}
+#pageTitle:not(:empty)+main{padding-top:0!important}
+/* F23: 配列データベースの選択欄は、見出しとの間・下との間を同じ幅(22px)に */
+#dbView{padding-top:0!important}#dbView>.dbbar:first-child{margin:0 0 22px!important}
+/* F21: 「開く」タブは半透明 */
+#contTab{background:rgba(232,91,145,.6)!important}
+/* F19/F20: 弾ごとのセクション */
+.edsec .arrayhead{margin:14px 0 10px}

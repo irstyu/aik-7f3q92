@@ -15,7 +15,7 @@
 <title>アイカツ！アンコール 配列サーチ</title>
 <style>
 
-:root{--ink:#20243a;--muted:#70778c;--line:#e6e9f1;--paper:#fff;--bg:#f5f7fb;--accent:#e85b91;--accent2:#f28bb1;--left:#64748b;--pr:#f8d86b;--er:#a9e8f8;--par:#f5a9c5;--shadow:0 10px 30px rgba(32,36,58,.07)}
+:root{--ink:#573647;--muted:#573647;--line:#e6e9f1;--paper:#fff;--bg:#f5f7fb;--accent:#e85b91;--accent2:#f28bb1;--left:#64748b;--pr:#f8d86b;--er:#a9e8f8;--par:#f5a9c5;--shadow:0 10px 30px rgba(32,36,58,.07)}
 *{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font-family:system-ui,-apple-system,"Noto Sans JP","Yu Gothic",sans-serif}
 button,input{font:inherit}button{cursor:pointer}
 .top{background:rgba(255,255,255,.92);border-bottom:1px solid var(--line);position:sticky;top:0;z-index:5;backdrop-filter:blur(12px)}
@@ -32,7 +32,7 @@ main{max-width:920px;margin:0 auto;padding:22px 18px 60px}
 .tab,.allbtn{border:1px solid var(--line);border-radius:13px;padding:12px 8px;background:#fff;color:#616a80;font-weight:800;box-shadow:0 3px 10px #2221}
 .tab.active{background:linear-gradient(145deg,#f28bb1,#df4f88);border-color:transparent;color:#fff;box-shadow:0 7px 17px #e85b9133}
 .tab .circle{display:inline-grid;place-items:center;width:25px;height:25px;border-radius:50%;background:#ffffff25;margin-right:5px}
-.allbtn{background:#20243a;color:white;border-color:#20243a}
+.allbtn{background:#573647;color:white;border-color:#573647}
 .stats{display:flex;align-items:center;justify-content:space-between;gap:10px;margin:15px 2px 8px}
 .stats strong{font-size:1.05rem}.stats span{font-size:.78rem;color:var(--muted)}
 .legend{display:flex;gap:7px;flex-wrap:wrap;margin:10px 0 14px}
@@ -45,7 +45,7 @@ main{max-width:920px;margin:0 auto;padding:22px 18px 60px}
 .chip{display:inline-flex;align-items:center;gap:5px;padding:6px 8px;border-radius:9px;background:#f3f4f8;border:1px solid #e9ebf1;font-size:.78rem}
 .chip button{border:0;background:transparent;color:#9298a7;padding:0 1px;font-size:1rem}
 .resulttitle{display:flex;justify-content:space-between;align-items:center;margin:21px 2px 8px}.resulttitle h2{font-size:1rem;margin:0}.resulttitle span{font-size:.76rem;color:var(--muted)}
-.cardresult{background:white;border:1px solid var(--line);border-radius:14px;padding:13px;margin:9px 0;box-shadow:0 4px 16px #20243a08}
+.cardresult{background:white;border:1px solid var(--line);border-radius:14px;padding:13px;margin:9px 0;box-shadow:0 4px 16px #57364708}
 .rhead{display:flex;align-items:center;justify-content:space-between;gap:8px}.rhead strong{font-size:1.05rem}.matchtype{font-size:.75rem;font-weight:800;color:#a52c60;background:#ffeaf2;border-radius:20px;padding:5px 9px}.matchtype.gap{color:#8a6414;background:#fff5d7}
 .meta{color:var(--muted);font-size:.75rem;margin-top:4px}
 .rares{margin-top:11px;border-top:1px solid #f0f1f5;padding-top:10px}.rares b{font-size:.8rem}.rareline{display:flex;align-items:center;gap:7px;flex-wrap:wrap;margin:8px 0 0;font-size:.82rem}.distance{font-size:.73rem;color:var(--muted);min-width:52px}.rareline.rarity-PR{background:#fff4c9;border-radius:9px;padding:8px}.rareline.rarity-ER{background:#e4f8ff;border-radius:9px;padding:8px}.rareline.rarity-PAR{background:#ffe8f0;border-radius:9px;padding:8px}
@@ -66,7 +66,7 @@ main{max-width:920px;margin:0 auto;padding:22px 18px 60px}
 .view-options input[type="checkbox"] { width: 16px; height: 16px; accent-color: var(--accent); cursor: pointer; }
 
 /* === タップ可能な配列候補カード === */
-.cardresult { display: block; width: 100%; text-align: left; background: white; border: 1.5px solid var(--line); border-radius: 14px; padding: 14px; margin: 10px 0; box-shadow: 0 4px 16px #20243a08; cursor: pointer; transition: transform 0.15s, border-color 0.15s, box-shadow 0.15s; position: relative; }
+.cardresult { display: block; width: 100%; text-align: left; background: white; border: 1.5px solid var(--line); border-radius: 14px; padding: 14px; margin: 10px 0; box-shadow: 0 4px 16px #57364708; cursor: pointer; transition: transform 0.15s, border-color 0.15s, box-shadow 0.15s; position: relative; }
 .cardresult:hover { transform: translateY(-2px); border-color: var(--accent2); box-shadow: 0 8px 24px #e85b9125; }
 .cardresult:active { transform: translateY(0); }
 .cardresult .tap-hint { display: inline-flex; align-items: center; gap: 4px; font-size: 0.74rem; font-weight: 800; color: var(--accent); margin-top: 6px; }
@@ -146,7 +146,7 @@ body.hide-images .slotopt { flex-direction: row; padding: 4px 8px; max-width: no
 .saved-item-actions { display: flex; gap: 6px; }
 
 .fab-container{gap:8px!important}
-.fab-btn,.fab-btn.secondary{width:auto!important;min-width:88px;height:44px!important;padding:0 16px;border-radius:12px!important;font-size:14px!important;font-weight:600;letter-spacing:.04em;background:rgba(255,255,255,.96)!important;color:#20243a!important;border:1px solid #d9dde8!important;box-shadow:0 4px 14px rgba(32,36,58,.12)!important;pointer-events:auto;backdrop-filter:blur(6px)}
+.fab-btn,.fab-btn.secondary{width:auto!important;min-width:88px;height:44px!important;padding:0 16px;border-radius:12px!important;font-size:14px!important;font-weight:600;letter-spacing:.04em;background:rgba(255,255,255,.96)!important;color:#573647!important;border:1px solid #d9dde8!important;box-shadow:0 4px 14px rgba(32,36,58,.12)!important;pointer-events:auto;backdrop-filter:blur(6px)}
 .fab-btn.primary{background:#e85b91!important;color:#fff!important;border-color:#e85b91!important}
 .fab-btn:active{transform:scale(.97)}
 .btn-action,.allbtn{letter-spacing:.03em}
@@ -155,26 +155,26 @@ body.hide-images .slotopt { flex-direction: row; padding: 4px 8px; max-width: no
 button{border-radius:12px}.btn-action,.ghost,.arrbtn,.tab,.allbtn,.addbtn,.suggestion{border-radius:12px}
 .fab-container{gap:8px!important}
 .fab-btn,.fab-btn.secondary,.fab-btn.primary{width:122px!important;min-width:122px!important;height:44px!important;padding:0 10px!important;border-radius:12px!important;display:flex!important;align-items:center;justify-content:center;gap:4px;white-space:nowrap;font-size:14px!important;font-weight:700}
-.edition{flex-wrap:wrap}.pills{display:flex;gap:6px;flex-wrap:wrap}.pill{border:1px solid #d9dde8;background:#fff;color:#20243a;border-radius:12px;padding:8px 14px;font-weight:700;font-size:14px}.pill.on{background:#e85b91;border-color:#e85b91;color:#fff}
+.edition{flex-wrap:wrap}.pills{display:flex;gap:6px;flex-wrap:wrap}.pill{border:1px solid #d9dde8;background:#fff;color:#573647;border-radius:12px;padding:8px 14px;font-weight:700;font-size:14px}.pill.on{background:#e85b91;border-color:#e85b91;color:#fff}
 .searchbox input{font-size:15px}.searchbox input::placeholder{font-size:13px}
 #sideTitle{border-bottom:3px solid var(--accent);padding-bottom:3px}
 #candidateCount{font-size:1rem!important;font-weight:800;color:var(--ink)}
 .saved-item.is-new{background:#fff0f6;border-color:#e85b91}.saved-no{display:inline-block;min-width:22px;color:#e85b91;font-weight:900;margin-right:6px}.new-tag{background:#e85b91;color:#fff;font-size:.65rem;font-weight:800;padding:2px 8px;border-radius:99px;margin-left:8px;vertical-align:middle}
 .legal{margin-top:42px;padding-top:14px;border-top:1px solid var(--line);font-size:10.5px;color:#8a90a3;line-height:1.7}.legal p{margin:0 0 7px}.legal a{color:#8a90a3}
-.destrow{display:flex;gap:8px;align-items:center;margin-top:6px}.destrow select{flex:1;min-width:0;font-size:15px;padding:11px;border-radius:12px;border:1px solid #d9dde8;color:#20243a;background:#fff;font-weight:600}.destrow button{flex:none;padding:12px 22px;font-size:16px;border-radius:12px}
+.destrow{display:flex;gap:8px;align-items:center;margin-top:6px}.destrow select{flex:1;min-width:0;font-size:15px;padding:11px;border-radius:12px;border:1px solid #d9dde8;color:#573647;background:#fff;font-weight:600}.destrow button{flex:none;padding:12px 22px;font-size:16px;border-radius:12px}
 
 /* === v5 === */
 .saved-item{flex-wrap:nowrap;gap:8px}.saved-item>div:first-child{min-width:0;flex:1}.saved-item strong{word-break:break-all;line-height:1.5}.saved-item-actions{flex:none}
 .new-tag{display:inline-block;margin-left:6px;line-height:1.3}
 .mini.danger{color:#c0392b;border-color:#e0b4ae}
-.fl{display:block;font-size:13px;color:#70778c;margin:2px 0 6px}.hint{font-size:12px;color:#8a90a3;margin:6px 2px 0}
+.fl{display:block;font-size:13px;color:#573647;margin:2px 0 6px}.hint{font-size:12px;color:#8a90a3;margin:6px 2px 0}
 .fab-btn.on{background:#e85b91!important;color:#fff!important;border-color:#e85b91!important}
-.cs{position:relative;display:inline-block;min-width:0;vertical-align:middle}.cs-btn{display:flex;align-items:center;justify-content:space-between;gap:10px;width:100%;min-height:46px;padding:10px 14px;border:1px solid #d9dde8;background:#fff;border-radius:12px;font-size:15px;font-weight:600;color:#20243a;text-align:left}
+.cs{position:relative;display:inline-block;min-width:0;vertical-align:middle}.cs-btn{display:flex;align-items:center;justify-content:space-between;gap:10px;width:100%;min-height:46px;padding:10px 14px;border:1px solid #d9dde8;background:#fff;border-radius:12px;font-size:15px;font-weight:600;color:#573647;text-align:left}
 .cs-btn span{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.cs-btn.pk span{color:#e85b91;font-weight:800}
 .caret{flex:none;width:8px;height:8px;border-right:2px solid #8a90a3;border-bottom:2px solid #8a90a3;transform:rotate(45deg);margin-top:-4px;transition:transform .15s}.cs.open .caret{transform:rotate(-135deg);margin-top:3px}
 .cs.open .cs-btn,.cs-btn:active{border-color:#e85b91;box-shadow:0 0 0 2px rgba(232,91,145,.18)}
 .cs-list{display:none;position:absolute;left:0;right:0;top:calc(100% + 6px);z-index:400;background:#fff;border:1px solid #e85b91;border-radius:12px;box-shadow:0 10px 26px rgba(32,36,58,.18);max-height:52vh;overflow:auto;padding:4px;min-width:150px}.cs.open .cs-list{display:block}
-.cs-item{display:block;width:100%;text-align:left;border:0;background:transparent;padding:12px;border-radius:9px;font-size:15px;color:#20243a;line-height:1.4}.cs-item.on{background:#fff0f6;font-weight:800}.cs-item:active{background:#ffe0ee}.cs-item.pk{color:#e85b91;font-weight:800}.cs-item.dis{opacity:.4}
+.cs-item{display:block;width:100%;text-align:left;border:0;background:transparent;padding:12px;border-radius:9px;font-size:15px;color:#573647;line-height:1.4}.cs-item.on{background:#fff0f6;font-weight:800}.cs-item:active{background:#ffe0ee}.cs-item.pk{color:#e85b91;font-weight:800}.cs-item.dis{opacity:.4}
 .destrow{align-items:stretch}.destrow .cs{flex:1}.destrow .cs-btn,.destrow #stockBtn{height:48px;min-height:48px}.destrow #stockBtn{padding:0 24px}
 .edition .cs{min-width:150px}.dbbar .cs{flex:1;min-width:110px}.mrow .cs{flex:1}
 
@@ -261,9 +261,8 @@ body{background-color:#fff6fa!important;background-image:url("data:image/svg+xml
 <div class="note">連続一致を最優先で表示し、間に未入力カードがある場合も順番が合えば候補に残します。複数のカード名がある枠は、1枠のランダム候補として判定します。</div>
 </section>
 <section id="arraysView" class="view">
-<div class="arrayhead"><h2>全配列表</h2></div>
 <p class="note">No.1〜12はそれぞれ独立した100枠の配列です。枠内に複数の名前がある場合は、その中からランダムに1枚排出されます。</p>
-<div id="arrayGrid" class="arrgrid"></div>
+<div id="arrayGrid"></div>
 <div id="arrayDetail"></div>
 </section>
 
@@ -533,12 +532,17 @@ function viewArrayDetail(no, lastIndex) {
   showArray(no, lastIndex);
 }
 
+// 弾ごとの配列データ。第2弾以降は配列が確定したらここに足すと、同じ画面に弾ごとのセクションが増える
+const EDITION_ARRAYS={'1':arrays};
+function arrGridHtml(active){
+ return Object.keys(EDITION_ARRAYS).map(ed=>`<div class="edsec"><div class="arrayhead"><h2>第${ed}弾</h2></div><div class="arrgrid">${Object.keys(EDITION_ARRAYS[ed]).map(num=>`<button class="arrbtn${num===active?' active':''}" style="${num===active?'border-color:var(--accent);background:#fff0f6;':''}" onclick="showArray('${num}', -1)"><b>No.${num}</b><small>100枠</small></button>`).join('')}</div></div>`).join('');
+}
 function showAllArrays(){
   $('searchView').classList.remove('active');
   $('arraysView').classList.add('active');
   toggleFab(true);
   $('arrayDetail').innerHTML='';
-  $('arrayGrid').innerHTML=Object.keys(arrays).map(n=>`<button class="arrbtn" onclick="showArray('${n}', -1)"><b>No.${n}</b><small>100枠の配列を見る</small></button>`).join('');
+  $('arrayGrid').innerHTML=arrGridHtml(null);
   window.scrollTo({top:0, behavior:'smooth'});
 }
 
@@ -554,11 +558,7 @@ function showArray(n, highlightIndex = -1){
  currentActiveArray = n;
  currentActiveSlotIndex = highlightIndex;
 
- $('arrayGrid').innerHTML=Object.keys(arrays).map(num=>`
-   <button class="arrbtn ${num===n?'active':''}" style="${num===n?'border-color:var(--accent);background:#fff0f6;':''}" onclick="showArray('${num}', -1)">
-     <b>No.${num}</b><small>100枠</small>
-   </button>
- `).join('');
+ $('arrayGrid').innerHTML=arrGridHtml(n);
 
  const slotsHtml = slots.map((s, idx)=>{
    const isCurrent = (idx === highlightIndex);
