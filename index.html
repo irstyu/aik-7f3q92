@@ -243,9 +243,10 @@ body{background-color:#fff6fa!important;background-image:url("data:image/svg+xml
 <button id="rightTab" class="tab active" onclick="switchSide('right')"><span class="circle">右</span>シリンダー</button>
 </div>
 <div class="stats"><strong id="sideTitle">右シリンダー</strong><span id="inputCount">0枚入力済み</span></div>
-<div class="legend"><span class="badge pr">PR</span><span class="badge er">ER</span><span class="badge par">PR★</span></div>
+<div class="resulttitle" id="histTitle"><h2>入力したカード</h2></div>
+<div class="legend legendrow"><span class="badge pr">PR</span><span class="badge er">ER</span><span class="badge par">PR★</span></div>
 <div class="history">
-<div class="historytop"><b>入力したカード</b><div class="actions"><button class="ghost" onclick="undo()">1つ戻す</button><button class="ghost" onclick="clearCurrent()">クリア</button></div></div>
+<div class="historytop"><span></span><div class="actions"><button class="ghost" onclick="undo()">1つ戻す</button><button class="ghost" onclick="clearCurrent()">クリア</button></div></div>
 <div id="historyChips" class="chips"></div>
 </div>
 <div class="view-header-actions" style="margin-top: 15px;">
@@ -324,6 +325,10 @@ function getCardImagePath(cardId, isStar) {
   return null;
 }
 
+function cbox(img,o,kind){
+  const L=(typeof CARD_INFO!=='undefined'&&CARD_INFO.landscape)?(CARD_INFO.landscape[o.star?'parallel':'normal']||[]):[];
+  return `<span class="cbox cbox-${kind}${L.indexOf(o.id)>=0?' land':''}"><img src="${img}" alt="${esc(o.name)}"></span>`;
+}
 function toggleImages() {
   const show = $('showImageToggle') ? $('showImageToggle').checked : true;
   document.body.classList.toggle('hide-images', !show);
@@ -392,7 +397,7 @@ function render(){
       ${rare.length?rare.map(r=>{
         const optHtml = r.slot.options.map(o=>{
           const img = getCardImagePath(o.id, o.star);
-          const imgTag = img ? `<img src="${img}" class="card-img-thumb" alt="${esc(o.name)}">` : '';
+          const imgTag = img ? cbox(img,o,'thumb') : '';
           return `<div class="rare-opt">${imgTag}<span>${o.star?'PR★ ':''}${o.id}:${esc(o.name)}</span></div>`;
         }).join('');
         return `<div class="rareline rarity-${r.slot.rarity}">
@@ -433,7 +438,8 @@ function loadHistory(index) {
   if (confirm(`「${item.name}」を${item.side==='right'?'右':'左'}シリンダーに読み込みますか？\n※現在の入力は上書きされます。`)) {
     switchSide(item.side);
     histories[currentSide] = [...item.data];
-    renderAll();
+    render();
+    setTimeout(function(){var h=document.getElementById('histTitle');if(h)window.scrollTo({top:h.getBoundingClientRect().top+window.scrollY-72,behavior:'smooth'})},60);
   }
 }
 
@@ -567,7 +573,7 @@ function showArray(n, highlightIndex = -1){
    
    const optList = s.options.length ? s.options.map(o=>{
      const img = getCardImagePath(o.id, o.star);
-     const imgTag = img ? `<img src="${img}" class="card-img-slot" alt="${esc(o.name)}">` : '';
+     const imgTag = img ? cbox(img,o,'slot') : '';
      return `<div class="slotopt">${imgTag}<div class="optbody"><span class="opt-text">${o.star?'PR★ ':''}${o.id}:${esc(o.name)}</span>${badge(s.rarity)}</div></div>`;
    }).join('') : '<span class="meta">カード名未記載</span>';
 

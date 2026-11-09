@@ -2,7 +2,7 @@
 (function(){
 function inp(m){var y=window.scrollY,r=prompt(m);window.scrollTo(0,y);requestAnimationFrame(function(){window.scrollTo(0,y)});return r}
 function note(m){var y=window.scrollY;alert(m);window.scrollTo(0,y);requestAnimationFrame(function(){window.scrollTo(0,y)})}function ask(m){var y=window.scrollY,r=confirm(m);window.scrollTo(0,y);requestAnimationFrame(function(){window.scrollTo(0,y)});return r}
-var VER='6.1',KEY='aikatsu_db_v1',CERT={confirmed:'確認済み',estimated:'推定',unknown:'不明'},MARK={confirmed:'確',estimated:'推',unknown:'－'};
+var VER='6.1',KEY='aikatsu_db_v1',CERT={confirmed:'確認済み',estimated:'推定',unknown:'不明'},STL={confirmed:'確認済み',estimated:'推定',unknown:'不明',none:'未登録'};
 var RAR=['','PR','R','N','ER','PAR'],SIDE={'':'未記録',left:'左シリンダー',right:'右シリンダー',unknown:'不明'},RN={PR:'PR(プレミアムレア)',ER:'ER(アンコールレア)',R:'R(レア)',N:'N(ノーマル)',PAR:'PR★(パラレル)'};
 var db=load(),ed='1',arr='1',$=function(i){return document.getElementById(i)};
 function load(){try{var d=JSON.parse(localStorage.getItem(KEY));if(d&&d.slots){if(!d.seed1){Object.keys(d.slots).forEach(function(x){if(x.indexOf('1-')===0)delete d.slots[x]});d.seed1=true}if(d.editions&&d.editions['1'])d.editions['1'].locked=true;if(d.editions&&!d.seed2&&!d.editions['2'])d.editions['2']={label:'第2弾',arrays:12};d.seed2=true;return d}}catch(e){}
@@ -23,7 +23,7 @@ var css=document.createElement('style');css.textContent=
 '.dbsheet label{display:block;margin-top:8px;font-size:14px}.dbsheet input,.dbsheet select{width:100%;font-size:17px;padding:11px;border-radius:10px;border:1px solid var(--line)}.dbsheet .row{display:flex;gap:8px;margin-top:12px}.dbsheet .row button{flex:1;padding:14px;font-size:16px;border-radius:10px;border:0;background:var(--accent);color:#fff}.dbsheet .row .g{background:#e9ecf3;color:#333}.dbsheet .row .d{background:#d9534f}';
 document.head.appendChild(css);
 var v=document.createElement('section');v.id='dbView';v.className='view';
-v.innerHTML='<div class="dbbar"><select id="dbEd"></select><select id="dbArr"></select></div><div id="dbProg" class="dbprog"></div><div class="gridframe"><div id="dbGrid" class="dbgrid gridin"></div></div><div id="dbObs"></div>'+
+v.innerHTML='<div class="dbbar"><select id="dbEd"></select><select id="dbArr"></select></div><div class="resulttitle"><h2>マス目の見かた</h2></div><div id="dbProg" class="dbprog"></div><div class="gridframe"><div id="dbGrid" class="dbgrid gridin"></div></div><div id="dbObs"></div>'+
 '<div class="dbbar" style="margin-top:14px"><button id="dbAddEd">+新しい弾</button><button id="dbAddArr">+新しい配列</button></div><div class="dbbar"><button id="dbDelEd">この弾を削除</button><button id="dbDelArr">最後の配列を削除</button></div><div class="dbprog"><b>バックアップ</b><div id="dbBk"></div><div class="dbbar"><button id="dbExp"> 書き出し</button><button id="dbImp"> 復元(追加)</button></div><input type="file" id="dbFile" accept=".json,application/json" style="display:none"></div>';
 var lg=document.querySelector('.legal'),vp=document.querySelector('.view').parentNode;if(lg&&lg.parentNode===vp)vp.insertBefore(v,lg);else vp.appendChild(v);
 var dbY=0;function show(on){if(on){dbY=window.scrollY;var s0=selEd();if(db.editions[s0]){ed=s0;arr='1'}}document.querySelectorAll('.view').forEach(function(x){x.classList.remove('active')});(on?v:$('searchView')).classList.add('active');if(window.toggleFab)toggleFab(false);if(on)draw();window.scrollTo(0,on?0:dbY)}
@@ -34,12 +34,11 @@ function nArr(){return db.editions[ed].arrays}
 function draw(){
  $('dbEd').innerHTML=Object.keys(db.editions).map(function(e){return'<option value="'+e+'"'+(edConf(e)?' data-pink="1"':'')+(e===ed?' selected':'')+'>'+esc(db.editions[e].label)+'</option>'}).join('');
  var o='';for(var a=1;a<=nArr();a++)o+='<option value="'+a+'"'+(arrConf(a)?' data-pink="1"':'')+(String(a)===arr?' selected':'')+'>配列 No.'+a+'</option>';$('dbArr').innerHTML=o;applyOwner();
- var c={confirmed:0,estimated:0,rar:0,unknown:0},g='';
- for(var s=1;s<=100;s++){var e=eff(arr,s),lab=e.name||(e.rarity?'':'未確認');
-  if(e.cert==='unknown'&&!e.name&&!e.rarity)c.unknown++;else if(e.cert==='estimated')c.estimated++;else if(e.cert==='confirmed'&&e.name)c.confirmed++;else c.rar++;
-  g+='<button class="dbc r-'+e.rarity+' c-'+e.cert+'" data-s="'+s+'"><b>'+s+'</b>'+'<span class="rr">'+(e.rarity==='PAR'?'PR★':(e.rarity||'?'))+'</span> '+MARK[e.cert]+(e.ids&&e.ids.length?'<small style="display:block;color:#666">'+e.ids[0]+(e.ids.length>1?'+':'')+'</small>':'')+'</button>'}
- $('dbGrid').innerHTML=g;var p=0;
- $('dbProg').innerHTML='<b style="color:'+(c.confirmed===100?'#e85b91':'inherit')+'">配列 No.'+arr+'</b> 確認済み '+c.confirmed+'/推定 '+c.estimated+'/レアリティのみ '+c.rar+'/未判明 '+c.unknown+'<br><small>確=確認済み 推=推定 －=不明 ピンク枠=パラレル</small>';
+ var c={confirmed:0,estimated:0,unknown:0,none:0},g='';
+ for(var s=1;s<=100;s++){var e=eff(arr,s),st=e.src==='none'?'none':e.cert;c[st]++;
+  g+='<button class="dbc r-'+e.rarity+' st-'+st+'" data-s="'+s+'"><b>'+s+'</b><span class="rr">'+(e.rarity==='PAR'?'PR★':(e.rarity||''))+'</span><span class="stl">'+STL[st]+'</span>'+(e.ids&&e.ids.length?'<small>'+e.ids[0]+(e.ids.length>1?'+':'')+'</small>':'')+'</button>'}
+ $('dbGrid').innerHTML=g;
+ $('dbProg').innerHTML='<b style="color:'+(c.confirmed===100?'#e85b91':'inherit')+'">配列 No.'+arr+'</b><div class="stcount">'+['confirmed','estimated','unknown','none'].map(function(x){return'<span class="stc st-'+x+'">'+STL[x]+' '+c[x]+'</span>'}).join('')+'</div>';
  $('dbBk').textContent='v'+VER+' '+(db.lastBackup?'最後の書き出し:'+db.lastBackup:'まだ書き出していません。こまめに書き出して保管してください。');drawObs()}
 $('dbEd').onchange=function(){ed=this.value;arr='1';draw()};$('dbArr').onchange=function(){arr=this.value;draw()};
 $('dbGrid').onclick=function(ev){var b=ev.target.closest('.dbc');if(b)sheet(+b.dataset.s)};
@@ -48,8 +47,8 @@ function sheet(s){var e=eff(arr,s),r=e.rec||{},old=$('dbSheet');if(old)old.remov
  var d=document.createElement('div');d.id='dbSheet';d.className='dbsheet';
  d.innerHTML='<b>配列 No.'+arr+' '+s+'枠目</b>'+(e.src==='base'?'<br><small>初期資料:'+esc(e.name||'カード名未記載')+'('+e.rarity+')。保存すると自分の記録として別に残り、初期資料は変わりません。</small>':'')+
  '<label>カード番号(入力すると候補が出ます)</label><input id="f0" inputmode="numeric" placeholder="例:24"><div id="f0r"></div><label>カード名(不明なら空欄)</label><input id="f1" value="'+esc(r.name||'')+'"><label>レアリティ</label><div class="rarow"><select id="f2">'+RAR.map(function(x){return'<option value="'+x+'"'+(x===(r.rarity||(e.src==='base'?e.rarity:''))?' selected':'')+'>'+(RN[x]||'不明')+'</option>'}).join('')+'</select></div>'+
- '<label>情報の確実性</label><select id="f3">'+Object.keys(CERT).map(function(x){return'<option value="'+x+'"'+(x===(r.cert||(e.src==='base'?'confirmed':'unknown'))?' selected':'')+'>'+CERT[x]+'</option>'}).join('')+'</select>'+
- '<label>観測したシリンダー</label><select id="f4">'+Object.keys(SIDE).map(function(x){return'<option value="'+x+'">'+SIDE[x]+'</option>'}).join('')+'</select>'+
+ '<label>確かさ</label><select id="f3">'+Object.keys(CERT).map(function(x){return'<option value="'+x+'"'+(x===(r.cert||(e.src==='base'?'confirmed':'unknown'))?' selected':'')+'>'+CERT[x]+'</option>'}).join('')+'</select>'+
+ '<label>見つけたシリンダー</label><select id="f4">'+Object.keys(SIDE).map(function(x){return'<option value="'+x+'">'+SIDE[x]+'</option>'}).join('')+'</select>'+
  '<div class="row"><button class="g" id="x0">閉じる</button>'+(e.rec?'<button class="d" id="x2">削除</button>':'')+'<button id="x1">保存</button></div>';
  document.body.appendChild(d);if(window.enhanceSelects)enhanceSelects();$('x0').onclick=function(){d.remove()};
  $('f0').oninput=function(){var v=this.value.trim(),box=$('f0r');box.innerHTML='';if(!v||typeof cards==='undefined')return;
@@ -82,14 +81,14 @@ function chains(list){var c=list.map(function(x){return x.cards.slice()}),M=3,go
     if(ok){c[i]=a.concat(b.slice(n));c.splice(j,1);go=true;break outer}}}}
  return c.sort(function(x,y){return y.length-x.length})}
 function drawObs(){var o=$('dbObs');if(!o)return;if(db.editions[ed].locked){o.innerHTML='';return}
- db.obsSeq=db.obsSeq||[];var L=db.obsSeq.filter(function(x){return x.ed===ed}),h='<div class="dbprog"><b>観測した並び</b>('+L.length+'件)<br><small>並びの追加は、トップページの「保存」から行います。</small><div class="dbbar"><button id="ob4">この配列の推定を確認済みにする</button></div>';
- if(L.length){h+='<b>並び順の推定</b><br><small>3枚以上重なる観測どうしを連結します。推定のため、確認済みにはなりません。</small>'+chains(L).map(function(c,i){return'<div style="margin:8px 0">連なり'+(i+1)+':'+c.length+'枚 <small>推定</small><br><small>'+c.map(function(x){return esc(x.id+':'+x.name)+(x.rarity&&x.rarity!=='N'?'['+(x.rarity==='PAR'?'PR★':x.rarity)+']':'')}).join(' → ')+'</small><br><button class="ob-as" data-ci="'+i+'" style="margin-top:6px;padding:10px 14px;border-radius:10px;border:1px solid var(--line);background:#fff;font-size:15px">配列に当てはめる</button></div>'}).join('')+'<div class="dbbar"><button id="ob3">この弾の観測を全削除</button></div>'}
+ db.obsSeq=db.obsSeq||[];var L=db.obsSeq.filter(function(x){return x.ed===ed}),h='<div class="dbprog"><b>見つけた並び</b>('+L.length+'件)<br><small>並びの追加は、トップページの「保存」から行います。</small><div class="dbbar"><button id="ob4">この配列の推定を確認済みにする</button></div>';
+ if(L.length){h+='<b>並び順の推定</b><br><small>3枚以上重なる並びどうしを連結します。推定のため、確認済みにはなりません。</small>'+chains(L).map(function(c,i){return'<div style="margin:8px 0">連なり'+(i+1)+':'+c.length+'枚 <small>推定</small><br><small>'+c.map(function(x){return esc(x.id+':'+x.name)+(x.rarity&&x.rarity!=='N'?'['+(x.rarity==='PAR'?'PR★':x.rarity)+']':'')}).join(' → ')+'</small><br><button class="ob-as" data-ci="'+i+'" style="margin-top:6px;padding:10px 14px;border-radius:10px;border:1px solid var(--line);background:#fff;font-size:15px">配列に当てはめる</button></div>'}).join('')+'<div class="dbbar"><button id="ob3">この弾の見つけた並びを全削除</button></div>'}
  o.innerHTML=h+'</div>';o.querySelectorAll('.ob-as').forEach(function(b){b.onclick=function(){assign(chains(L)[+b.dataset.ci])}});
  $('ob4').onclick=function(){var n=0;for(var s=1;s<=100;s++){var r=db.slots[k(ed,arr,s)];if(r&&r.cert==='estimated')n++}
   if(!n){note('この配列に推定の記録はありません。');return}
   if(!ask('配列 No.'+arr+' の推定 '+n+'枠を、確認済みにします。よろしいですか？'))return;
   for(var s2=1;s2<=100;s2++){var r2=db.slots[k(ed,arr,s2)];if(r2&&r2.cert==='estimated')r2.cert='confirmed'}save();draw()};
- if($('ob3'))$('ob3').onclick=function(){if(ask('この弾の観測列をすべて削除しますか？')){db.obsSeq=db.obsSeq.filter(function(x){return x.ed!==ed});save();draw()}}}
+ if($('ob3'))$('ob3').onclick=function(){if(ask('この弾の見つけた並びをすべて削除しますか？')){db.obsSeq=db.obsSeq.filter(function(x){return x.ed!==ed});save();draw()}}}
 
 function assign(c){if(!c)return;var a=parseInt(inp('この連なり('+c.length+'枚)を当てはめる配列No.を入力(1〜'+nArr()+')'),10);if(!(a>=1&&a<=nArr())){note('配列No.が正しくありません。');return}
  var st=parseInt(inp('先頭のカードが入る枠番号(1〜100)'),10);if(!(st>=1&&st<=100)){note('枠番号が正しくありません。');return}
@@ -152,7 +151,7 @@ $('dbDelEd').onclick=function(){if(!isOwner())return;var e=db.editions[ed];
  if(e.locked){note('確定済みの弾は削除できません。');return}
  if(Object.keys(db.editions).length<2){note('最後の1つの弾は削除できません。');return}
  var ns=cnt(ed+'-'),no=(db.obsSeq||[]).filter(function(x){return x.ed===ed}).length;
- if(ns||no){if(!ask('「'+e.label+'」には記録があります(枠 '+ns+'件・観測 '+no+'件)。削除すると元に戻せません。削除しますか?'))return}
+ if(ns||no){if(!ask('「'+e.label+'」には記録があります(枠 '+ns+'件・見つけた並び '+no+'件)。削除すると元に戻せません。削除しますか?'))return}
  else if(!ask('「'+e.label+'」を削除しますか?'))return;
  Object.keys(db.slots).forEach(function(x){if(x.indexOf(ed+'-')===0)delete db.slots[x]});db.obsSeq=(db.obsSeq||[]).filter(function(x){return x.ed!==ed});
  delete db.editions[ed];ed='1';arr='1';save();syncEd();draw()};

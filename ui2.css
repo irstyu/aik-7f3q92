@@ -108,9 +108,6 @@ main{padding-top:12px!important}
 .hero p{margin:2px 0!important}
 /* F3: メニューの多層枠(白い半透明→細いピンク→水色→内側の水色の線)と中央配置 */
 #menuOv{justify-content:center!important}
-.menupanel{position:relative;width:min(86vw,360px);box-sizing:border-box;padding:26px 14px 22px;background:rgba(255,255,255,.96);border:5px solid #8fd8f0;border-radius:30px;box-shadow:0 0 0 2px #ee3f8e,0 0 0 12px rgba(255,255,255,.55);display:flex;flex-direction:column;align-items:center;gap:6px}
-.menupanel::before{content:"";position:absolute;inset:7px;border:2px solid #8fd8f0;border-radius:22px;pointer-events:none}
-.menupanel nav,.menupanel .menuset{position:relative}.menupanel .menuset{margin-top:14px}
 /* F2: メニュー画面の「配列サーチに戻る」 */
 #menuBack{position:fixed;top:12px;left:12px;z-index:960;width:54px;height:54px;border-radius:50%;background:#fff;border:3px solid #ee3f8e;box-shadow:0 0 0 3px #fff,0 0 0 5px #f8a5c9,0 6px 14px rgba(232,63,140,.3);display:flex;align-items:center;justify-content:center;padding:0}
 /* F7: TOPボタン(カードリスト・配列データベース。右下) */
@@ -143,3 +140,94 @@ body.sub .brand small{display:block;color:#573647;font-size:.7rem;margin-top:1px
 #contTab{background:rgba(232,91,145,.6)!important}
 /* F19/F20: 弾ごとのセクション */
 .edsec .arrayhead{margin:14px 0 10px}
+
+/* === 修正第6弾 === */
+/* NG-2: 配列データベースの選択肢の枠を消す(.dbbar button の枠が選択肢にも効いていた) */
+.dbbar .cs-list .cs-item{border:0!important;border-radius:9px!important;padding:12px!important;flex:none!important;min-width:0!important;background:transparent!important;font-size:15px!important}
+.dbbar .cs-list .cs-item.on{background:#fff0f6!important}
+/* 全体ルール: メニューはふわっと出入り */
+#menuOv{display:flex!important;opacity:0;visibility:hidden;pointer-events:none;animation:none!important;transition:opacity .25s ease,visibility 0s linear .25s}
+#menuOv.show{opacity:1;visibility:visible;pointer-events:auto;transition:opacity .25s ease,visibility 0s}
+.menupanel{display:flex;flex-direction:column;align-items:center;gap:6px;width:100%}
+.menupanel nav{position:relative}.menupanel .menuset{margin-top:14px}
+/* 8: メニューボタン自体を公式風に(ピンクの円盤+白い輪+水色の輪+細いピンク線+半透明の白いハロー) */
+#menuBtn{box-sizing:border-box!important;border:4px solid #fff!important;background:#ec3f8c!important;box-shadow:0 0 0 6px #6dd3f8,0 0 0 8px #ee3f8e,0 0 0 18px rgba(255,255,255,.5)!important}
+/* 17: ヘッダーの大見出しはピンク */
+.brand strong,body.sub .brand strong{color:#ee3f8e!important}
+/* 2/3: 説明文は「?」のときだけ表示 */
+#searchView>.note,#arraysView>.note{display:none}
+.searchbox{position:relative}.searchbox .helpq{flex:none;margin-right:2px}
+.helppop.out{animation:none;opacity:0;transition:opacity .18s ease}
+/* 1: 入力したカード(他の3つと同じプレート見出し)。見出しの文字を浮かせ、PR/ER/PR★は白地の独立した行に */
+.resulttitle h2,.arrayhead h2{text-shadow:0 2px 0 #d62b86,0 0 8px rgba(214,43,134,.55)}
+.legendrow{display:inline-flex;margin:6px 0 12px;padding:6px 10px;background:#fff;border-radius:12px;box-shadow:0 0 0 1px #f8a5c9}
+.historytop{justify-content:flex-end}
+/* 4: 現在位置の枠は少し透ける */
+.slotlist .slot.current-pos{background:rgba(255,255,255,.55)!important}
+.slotlist .slot.current-pos .slotin{background-color:color-mix(in srgb,var(--sbg,#fff) 55%,transparent)!important}
+/* 6: 配列の続きボタンは右からスライドして出入り */
+@keyframes slideInR{from{transform:translateX(110%);opacity:0}to{transform:none;opacity:1}}
+@keyframes slideOutR{to{transform:translateX(110%);opacity:0}}
+#contWrap{animation:slideInR .32s ease!important}
+#contWrap.out{animation:slideOutR .26s ease forwards!important}
+/* 10/11: 画像ビューアの矢印は手前に出し、矢印の字形は光学的に中心へ */
+#ov .lbn{z-index:3}
+#ov .lbn .chev{width:10px;height:10px;margin:0!important}
+#ov .lbn .chev.l{transform:translateX(2.5px) rotate(-135deg)}
+#ov .lbn .chev.r{transform:translateX(-2.5px) rotate(45deg)}
+/* NG-1/F36: カード画像は縦向きカードと同じ大きさの枠に入れる(横向きは回転して収める) */
+.cbox{position:relative;flex:none;aspect-ratio:460/670;overflow:hidden;border-radius:5px;box-shadow:0 2px 5px rgba(0,0,0,.15)}
+.cbox img{display:block;width:100%;height:auto;margin:0;border-radius:0;box-shadow:none}
+.cbox.land img{position:absolute;top:50%;left:50%;width:145.6%;max-width:none;transform:translate(-50%,-50%) rotate(90deg)}
+.cbox-thumb{width:44px}.cbox-slot{width:64px}
+body.hide-images .cbox{display:none!important}
+.rare-opt{min-height:68px}
+/* 18: 浮動ボタンの統一。右側は同じ幅の細長い縦ドック(白地+ピンク文字、現在位置だけピンク) */
+#arrayFabContainer{right:6px!important;bottom:calc(14px + env(safe-area-inset-bottom))!important;gap:5px!important;padding:6px;background:rgba(255,255,255,.62);border:1px solid #f8a5c9;border-radius:18px;backdrop-filter:blur(6px)}
+#arrayFabContainer .fab-btn,.topfloat{width:82px!important;min-width:82px!important;height:34px!important;padding:0 6px!important;border-radius:12px!important;font-size:12px!important;font-weight:800!important;background:#fff!important;color:#ee3f8e!important;border:1px solid #f8a5c9!important;box-shadow:none!important;gap:3px!important}
+#arrayFabContainer .fab-btn.primary{background:#ee3f8e!important;color:#fff!important;border-color:#ee3f8e!important}
+#arrayFabContainer .fab-btn.on{background:#fff!important;color:#ee3f8e!important}
+.topfloat{right:12px!important;box-shadow:0 4px 14px rgba(238,63,142,.18)!important}
+
+/* 指摘14/15/21: 配列データベースのマス目は、背景色で状態を区別(確認済み/推定/不明/未登録)。文字だけでも読める */
+#dbGrid .dbc{display:flex;flex-direction:column;align-items:center;justify-content:flex-start;gap:2px;padding:5px 2px 6px;min-height:72px;border:1.5px solid #f8a5c9;opacity:1;background:#fff}
+#dbGrid .dbc b{font-size:15px;line-height:1.1}
+#dbGrid .dbc .rr{display:inline-block;min-width:26px;padding:0 6px;border-radius:99px;font-size:10px;font-weight:800;line-height:16px;background:#eef0f6}
+#dbGrid .dbc .rr:empty{display:none}
+#dbGrid .dbc.r-R .rr{background:#e9f1fb}
+#dbGrid .dbc.r-PR .rr{background:#e0b020}#dbGrid .dbc.r-ER .rr{background:#3fb2d4}#dbGrid .dbc.r-PAR .rr{background:#ee3f8e}
+#dbGrid .dbc .stl{font-size:10px;font-weight:800;line-height:1.2;letter-spacing:0}
+#dbGrid .dbc small{display:block;font-size:9.5px;color:#ee3f8e!important;opacity:.8;line-height:1.1}
+#dbGrid .dbc.st-confirmed,.stc.st-confirmed{background:#dff3e4;border-color:#8fd0a2}
+#dbGrid .dbc.st-estimated,.stc.st-estimated{background:#fff2c7;border:1.5px solid #ecc85a}
+#dbGrid .dbc.st-unknown,.stc.st-unknown{background:#dce9f8;border-color:#93b6e0}
+#dbGrid .dbc.st-none,.stc.st-none{background:#fff;border:1.5px dashed #f0a9c8}
+.stcount{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+.stc{display:inline-block;padding:4px 10px;border-radius:99px;font-size:12.5px;font-weight:800;color:#ee3f8e;border:1.5px solid transparent}
+.stc.st-confirmed{border-color:#8fd0a2}.stc.st-unknown{border-color:#93b6e0}
+
+/* 指摘18の残り: BACKもTOP・縦ドックと同じデザイン(白地・ピンク文字・細いピンク枠・角丸12px・82x34) */
+body #backFloat{left:12px!important;bottom:calc(16px + env(safe-area-inset-bottom))!important;width:82px!important;height:34px!important;min-width:82px!important;padding:0 6px!important;border-radius:12px!important;gap:3px!important;font-size:12px!important;font-weight:800!important;letter-spacing:.04em!important;background:#fff!important;color:#ee3f8e!important;border:1px solid #f8a5c9!important;box-shadow:0 4px 14px rgba(238,63,142,.18)!important;opacity:1!important;animation:none!important}
+body #backFloat .chev{width:8px!important;height:8px!important;margin:0!important}
+body #backFloat:active{transform:scale(.97)}
+
+/* 全体ルールの残り: 出入りは ふわっと(出る=下からフェード、消える=逆の動き) */
+@keyframes floatIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+@keyframes floatOut{from{opacity:1;transform:none}to{opacity:0;transform:translateY(10px)}}
+@keyframes viewIn{from{opacity:0}to{opacity:1}}
+#topFloat,#arrayFabContainer,#contTab,#entryBox,#manualBox{animation:floatIn .25s ease}
+#arrayFabContainer{transition:none}
+body #backFloat{animation:floatIn .25s ease!important}
+#topFloat.fx-out,#backFloat.fx-out,#arrayFabContainer.fx-out,#contTab.fx-out,#contWrap.fx-out,#entryBox.fx-out,#manualBox.fx-out,.searchbox.fx-out{animation:floatOut .22s ease forwards!important;pointer-events:none}
+.searchbox{animation:viewIn .22s ease}
+.topfloat{transition:bottom .25s ease}
+/* サジェスト一覧: 出る=上からふわっと、消える=逆 */
+@keyframes sugIn{from{opacity:0;transform:translateY(-6px)}to{opacity:1;transform:none}}
+@keyframes sugOut{from{opacity:1;transform:none}to{opacity:0;transform:translateY(-6px)}}
+.suggestions.show{animation:sugIn .2s ease}
+.suggestions.ghost:not(.show){display:block;pointer-events:none;animation:sugOut .2s ease forwards}
+/* 選択欄の一覧: 閉じるときも ふわっと(対応ブラウザ) */
+.cs-list{display:none;opacity:0;transform:translateY(-4px);transition:opacity .18s ease,transform .18s ease,display .18s allow-discrete}
+.cs.open .cs-list{display:block;opacity:1;transform:none}
+/* 画面(検索/配列/データベース)の切り替えはフェードで入る */
+.view.active{animation:viewIn .25s ease}

@@ -177,7 +177,7 @@ var ti=window.toggleImages;window.toggleImages=function(){
  var pt=document.createElement('div');pt.id='pageTitle';if(hd)hd.parentNode.insertBefore(pt,hd.nextSibling);
  var mb=document.createElement('button');mb.id='menuBtn';mb.type='button';mb.innerHTML='<span class="bars"></span><span>MENU</span>';document.body.appendChild(mb);
  var mo=document.createElement('div');mo.id='menuOv';
- mo.innerHTML='<button id="menuBack" type="button" title="配列サーチに戻る"><svg viewBox="0 0 32 32" width="28" height="28"><rect x="5" y="3" width="14" height="19" rx="2.5" fill="#ffd3e5" stroke="#ee3f8e" stroke-width="2"/><circle cx="19" cy="19" r="6" fill="#fff" stroke="#ee3f8e" stroke-width="2.4"/><path d="M23.5 23.5L28 28" stroke="#ee3f8e" stroke-width="3" stroke-linecap="round"/></svg></button><button id="menuClose" type="button">×</button><div class="menupanel"><nav><a href="./" data-go="search">配列サーチ</a><a href="./#db" data-go="db">配列データベース</a><a href="cards.html" data-go="cards">カードリスト</a><a href="updates.html" data-go="page">更新履歴</a><a href="collect.html" data-go="page">データ収集状況</a></nav><div class="menuset"><button id="menuUpd" type="button" class="mini">最新版に更新</button></div></div>';
+ mo.innerHTML='<button id="menuBack" type="button" title="配列サーチに戻る"><svg viewBox="0 0 32 32" width="28" height="28"><rect x="5" y="3" width="14" height="19" rx="2.5" fill="#ffd3e5" stroke="#ee3f8e" stroke-width="2"/><circle cx="19" cy="19" r="6" fill="#fff" stroke="#ee3f8e" stroke-width="2.4"/><path d="M23.5 23.5L28 28" stroke="#ee3f8e" stroke-width="3" stroke-linecap="round"/></svg></button><button id="menuClose" type="button">×</button><div class="menupanel"><nav><a href="./" data-go="search">配列サーチ</a><a href="./#db" data-go="db">配列データベース</a><a href="cards.html" data-go="cards">カードリスト</a><a href="collect.html" data-go="page">データ収集状況</a><a href="updates.html" data-go="page">更新履歴</a></nav><div class="menuset"><button id="menuUpd" type="button" class="mini">最新版に更新</button></div></div>';
  document.body.appendChild(mo);
  function contOn(){return true}
  function setMenu(on){mo.classList.toggle('show',on);mb.classList.toggle('open',on);mb.innerHTML=on?'<span class="x">×</span>':'<span class="bars"></span><span>MENU</span>'}
@@ -197,13 +197,13 @@ var ti=window.toggleImages;window.toggleImages=function(){
  var ctab=document.createElement('button');ctab.id='contTab';ctab.type='button';ctab.title='配列の続きを表示';ctab.innerHTML='<i class="chev l"></i>';document.body.appendChild(ctab);
  var tuck=false;
  $('contGo').onclick=function(){viewArrayDetail(String(currentActiveArray),currentActiveSlotIndex)};
- $('contX').onclick=function(){tuck=true;vis()};ctab.onclick=function(){tuck=false;vis()};
+ $('contX').onclick=function(){cw.classList.add('out');setTimeout(function(){cw.classList.remove('out');tuck=true;vis()},270)};ctab.onclick=function(){tuck=false;vis()};
  window.markPos=function(idx){if(!currentActiveArray)return;currentActiveSlotIndex=idx;if(adv.sig!==sig())adv={sig:sig(),map:{}};adv.map[currentActiveArray]=idx;persist();
   [].forEach.call(document.querySelectorAll('#arrayDetail .slot'),function(el,i){var cur=i===idx;el.classList.toggle('current-pos',cur);var b=el.querySelector('.current-pos-badge');if(cur&&!b){var d=document.createElement('div');d.className='current-pos-badge';d.textContent='★ 現在位置('+(i+1)+'枠目)';el.insertBefore(d,el.firstChild)}else if(!cur&&b)b.remove()});
   var hb=document.querySelector('#arrayDetail .arrayhead .badge');if(hb)hb.textContent='現在位置:'+(idx+1)+'枠目'};
  var bv=true;if(window.IntersectionObserver&&hd){new IntersectionObserver(function(es){bv=es[0].isIntersecting;vis()},{threshold:0.05}).observe(hd)}
  function curView(){var d=$('dbView'),a=$('arraysView');return d&&d.classList.contains('active')?'db':(a&&a.classList.contains('active')?'arrays':'search')}
- function vis(){var v=curView();tp.style.display=v==='db'?'flex':'none';bk.style.display=v==='search'?'none':'flex';hf.classList.toggle('show',v!=='search'&&!bv);
+ function vis(){var v=curView();tp.style.display=(v==='db'||v==='search')?'flex':'none';tp.style.bottom=(v==='search'&&contOn()&&currentActiveArray&&!tuck)?'calc(78px + env(safe-area-inset-bottom))':'';bk.style.display=v==='search'?'none':'flex';hf.classList.toggle('show',v!=='search'&&!bv);
   pt.textContent=v==='db'?'配列データベース':(v==='arrays'?'配列詳細':'');
   var cok=(v==='search'&&contOn()&&currentActiveArray);cw.style.display=(cok&&!tuck)?'flex':'none';ctab.style.display=(cok&&tuck)?'flex':'none'}
  if(window.MutationObserver)new MutationObserver(vis).observe(document.body,{subtree:true,attributes:true,attributeFilter:['class']});vis();setInterval(vis,700);
