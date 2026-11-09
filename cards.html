@@ -36,14 +36,14 @@ h1{display:block;width:max-content;max-width:78%;margin:24px auto 20px;padding:1
 footer{padding:14px;font-size:10.5px;color:#8a90a3;text-align:center;line-height:1.7}
 @media(min-width:700px){#g{grid-template-columns:repeat(6,1fr)}}
 </style></head><body class="sub">
-<button id="homeFloat" type="button" title="配列サーチへ" onclick="location.href=BASE"><svg viewBox="0 0 32 32" width="28" height="28"><rect x="5" y="3" width="14" height="19" rx="2.5" fill="#ffd3e5" stroke="#ee3f8e" stroke-width="2"/><circle cx="19" cy="19" r="6" fill="#fff" stroke="#ee3f8e" stroke-width="2.4"/><path d="M23.5 23.5L28 28" stroke="#ee3f8e" stroke-width="3" stroke-linecap="round"/></svg></button>
+<button id="homeFloat" type="button" title="配列サーチへ" onclick="location.href=BASE+'#search'"><svg viewBox="0 0 32 32" width="28" height="28"><rect x="5" y="3" width="14" height="19" rx="2.5" fill="#ffd3e5" stroke="#ee3f8e" stroke-width="2"/><circle cx="19" cy="19" r="6" fill="#fff" stroke="#ee3f8e" stroke-width="2.4"/><path d="M23.5 23.5L28 28" stroke="#ee3f8e" stroke-width="3" stroke-linecap="round"/></svg></button>
 <button id="backFloat" type="button" style="display:flex" onclick="goBack()"><i class="chev l"></i><span>BACK</span></button>
 <button id="menuBtn" type="button"><span class="bars"></span><span>MENU</span></button>
-<div id="menuOv"><button id="menuBack" type="button" title="配列サーチに戻る"><svg viewBox="0 0 32 32" width="28" height="28"><rect x="5" y="3" width="14" height="19" rx="2.5" fill="#ffd3e5" stroke="#ee3f8e" stroke-width="2"/><circle cx="19" cy="19" r="6" fill="#fff" stroke="#ee3f8e" stroke-width="2.4"/><path d="M23.5 23.5L28 28" stroke="#ee3f8e" stroke-width="3" stroke-linecap="round"/></svg></button><div class="menupanel"><nav><a href="./">配列サーチ</a><a href="./#db">配列データベース</a><a href="./cards.html" id="menuHere">カードリスト</a><a href="./collect.html">データ収集状況</a><a href="./updates.html">更新履歴</a></nav></div></div>
+<div id="menuOv"><button id="menuBack" type="button" title="配列サーチに戻る"><svg viewBox="0 0 32 32" width="28" height="28"><rect x="5" y="3" width="14" height="19" rx="2.5" fill="#ffd3e5" stroke="#ee3f8e" stroke-width="2"/><circle cx="19" cy="19" r="6" fill="#fff" stroke="#ee3f8e" stroke-width="2.4"/><path d="M23.5 23.5L28 28" stroke="#ee3f8e" stroke-width="3" stroke-linecap="round"/></svg></button><div class="menupanel"><nav><a href="./#search">配列サーチ</a><a href="./#arrays">配列詳細</a><a href="./#db">配列データ</a><a href="./cards.html" id="menuHere">カードリスト</a><a href="./collect.html">データ収集状況</a><a href="./updates.html">更新履歴</a></nav></div></div>
 <header class="top"><div class="topin"><div class="brand" id="brandTop" title="配列サーチへ"><div class="mark">A!</div><div><strong>アイカツ！アンコール</strong><small>配列サーチ・カード配列データ収集</small></div></div></div></header>
 <h1>カードリスト</h1>
 <div class="panel"><div class="fld"><label>フリーワード</label><input id="q" placeholder="カード番号・カード名を入力"></div>
-<div class="fld"><label>弾数</label><select id="ed"><option value="">すべて</option><option value="1">第1弾</option><option value="P">プロモーション</option></select></div>
+<div class="fld"><label>弾数</label><select id="ed"><option value="">すべて</option><option value="1">第1弾</option><option value="P">プロモーションカード</option></select></div>
 <div class="more"><button id="moreBtn" type="button"><span>くわしくさがす</span><b id="moreMark" class="pm"><i></i><i></i></b></button>
 <div id="moreBody"><div class="mbi"><div class="fld"><label>タイプ</label><select id="tf"><option value="">すべて</option><option value="cute">キュート</option><option value="cool">クール</option><option value="sexy">セクシー</option><option value="pop">ポップ</option></select></div>
 <div class="fld"><label>レアリティ</label><select id="rf"><option value="">すべて</option><option value="PR">PR(プレミアムレア)</option><option value="R">R(レア)</option><option value="N">N(ノーマル)</option><option value="ER">ER(アンコールレア)</option></select></div>
@@ -70,9 +70,9 @@ G.onclick=function(e){var el=e.target.closest('.c');if(el&&e.target.tagName==='I
 OV.onclick=function(e){var b=e.target.closest('.lbn');if(b){e.stopPropagation();showLB(LI+(+b.dataset.d));return}OV.classList.remove('show')};
 function setMenu(on){MO.classList.toggle('show',on);MB.classList.toggle('open',on);MB.innerHTML=on?'<span class="x">×</span>':'<span class="bars"></span><span>MENU</span>'}
 MB.onclick=function(){setMenu(!MO.classList.contains('show'))};document.getElementById('menuHere').onclick=function(e){e.preventDefault();setMenu(false)};
-function goBack(){if(history.length>1)history.back();else location.href=BASE}
+function goBack(){if(history.length>1)history.back();else location.href=BASE+'#search'}
 if(window.IntersectionObserver)new IntersectionObserver(function(es){document.getElementById('homeFloat').classList.toggle('show',!es[0].isIntersecting)},{threshold:0.05}).observe(document.querySelector('header.top'));
-document.getElementById('brandTop').onclick=function(){location.href=BASE};document.getElementById('menuBack').onclick=function(){location.href=BASE};
+document.getElementById('brandTop').onclick=function(){location.href=BASE+'#search'};document.getElementById('menuBack').onclick=function(){location.href=BASE+'#search'};
 draw();</script><script>(function csInstall(){
  function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')}
  function closeAll(){[].forEach.call(document.querySelectorAll('.cs.open'),function(w){w.classList.remove('open')})}

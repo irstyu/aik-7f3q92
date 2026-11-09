@@ -242,11 +242,10 @@ body{background-color:#fff6fa!important;background-image:url("data:image/svg+xml
 <button class="allbtn" onclick="showAllArrays()">全配列表</button>
 <button id="rightTab" class="tab active" onclick="switchSide('right')"><span class="circle">右</span>シリンダー</button>
 </div>
-<div class="stats"><strong id="sideTitle">右シリンダー</strong><span id="inputCount">0枚入力済み</span></div>
 <div class="resulttitle" id="histTitle"><h2>入力したカード</h2></div>
-<div class="legend legendrow"><span class="badge pr">PR</span><span class="badge er">ER</span><span class="badge par">PR★</span></div>
 <div class="history">
-<div class="historytop"><span></span><div class="actions"><button class="ghost" onclick="undo()">1つ戻す</button><button class="ghost" onclick="clearCurrent()">クリア</button></div></div>
+<div class="historytop hhead"><div class="legendin"><span class="badge pr">PR</span><span class="badge er">ER</span><span class="badge par">PR★</span><span class="badge r">R</span><span class="badge n">N</span></div><div class="sidebox"><strong id="sideTitle">右シリンダー</strong><span id="inputCount">0枚入力済み</span></div></div>
+<div class="historytop hacts"><span></span><div class="actions"><button class="ghost" onclick="undo()">1つ戻す</button><button class="ghost" onclick="clearCurrent()">クリア</button></div></div>
 <div id="historyChips" class="chips"></div>
 </div>
 <div class="view-header-actions" style="margin-top: 15px;">
@@ -259,7 +258,7 @@ body{background-color:#fff6fa!important;background-image:url("data:image/svg+xml
 
 <div class="resulttitle"><h2>配列候補</h2><div style="display:flex;align-items:center;gap:10px"><button id="resImgBtn" class="mini on" type="button">画像 ON</button><span id="candidateCount">入力待ち</span></div></div>
 <div id="results" class="empty">カードを入力すると、候補配列と次の高レア枠を表示します。</div>
-<div class="note">連続一致を最優先で表示し、間に未入力カードがある場合も順番が合えば候補に残します。複数のカード名がある枠は、1枠のランダム候補として判定します。</div>
+<div class="note">・連続一致を最優先で表示します。<br>・間に未入力カードがある場合も、順番が合えば候補に残します。<br>・複数のカード名がある枠は、1枠のランダム候補として判定します。</div>
 </section>
 <section id="arraysView" class="view">
 <p class="note">No.1〜12はそれぞれ独立した100枠の配列です。枠内に複数の名前がある場合は、その中からランダムに1枚排出されます。</p>
@@ -500,7 +499,7 @@ function addSavedToDb(idx) {
   if (!item) return;
   const e = item.ed || ($('editionSelect') ? $('editionSelect').value : '1') || '1';
   const r = window.sendObsData ? sendObsData(item.side, item.data, e) : '';
-  alert(r==='locked' ? '第'+e+'弾は配列が確定済みのため、データベースには追加しません。' : r==='dup' ? '同じ並びはすでにデータベースに追加済みです。' : 'データベースに追加しました(推定)。');
+  alert(r==='locked' ? '第'+e+'弾は配列が確定済みのため、配列データには追加しません。' : r==='dup' ? '同じ並びはすでに配列データに追加済みです。' : '配列データに追加しました(推定)。');
 }
 
 // === スクロール・ナビゲーション機能 ===
@@ -540,8 +539,15 @@ function viewArrayDetail(no, lastIndex) {
 
 // 弾ごとの配列データ。第2弾以降は配列が確定したらここに足すと、同じ画面に弾ごとのセクションが増える
 const EDITION_ARRAYS={'1':arrays};
+let arrEd='1';
+function setArrEd(v){arrEd=v;$('arrayDetail').innerHTML='';currentActiveArray=null;currentActiveSlotIndex=-1;$('arrayGrid').innerHTML=arrGridHtml(null)}
 function arrGridHtml(active){
- return Object.keys(EDITION_ARRAYS).map(ed=>`<div class="edsec"><div class="arrayhead"><h2>第${ed}弾</h2></div><div class="arrgrid">${Object.keys(EDITION_ARRAYS[ed]).map(num=>`<button class="arrbtn${num===active?' active':''}" style="${num===active?'border-color:var(--accent);background:#fff0f6;':''}" onclick="showArray('${num}', -1)"><b>No.${num}</b><small>100枠</small></button>`).join('')}</div></div>`).join('');
+ const eds=[...($('editionSelect')?$('editionSelect').options:[])].map(o=>({v:o.value,l:o.textContent.replace(/\(.*\)/,'')}));
+ if(!eds.length)eds.push({v:'1',l:'第1弾'});
+ const sel=`<div class="arrayhead edhead"><div class="hwrap"><div class="edpick"><select id="arrEdSel" onchange="setArrEd(this.value)">${eds.map(e=>`<option value="${e.v}"${e.v===arrEd?' selected':''}>${e.l}</option>`).join('')}</select></div><button type="button" class="helpq" data-t="第1弾" aria-label="配列のしくみの説明">?</button></div></div>`;
+ const E=EDITION_ARRAYS[arrEd];
+ const body=E?`<div class="arrgrid">${Object.keys(E).map(num=>`<button class="arrbtn${num===active?' active':''}" style="${num===active?'border-color:var(--accent);background:#fff0f6;':''}" onclick="showArray('${num}', -1)"><b>No.${num}</b><small>100枠</small></button>`).join('')}</div>`:'<div class="empty">この弾の配列はまだありません。</div>';
+ return `<div class="edsec">${sel}${body}</div>`;
 }
 function showAllArrays(){
   $('searchView').classList.remove('active');

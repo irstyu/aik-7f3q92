@@ -126,11 +126,6 @@ body.sub .brand{display:flex;align-items:center;gap:10px;cursor:pointer}
 body.sub .mark{width:38px;height:38px;border-radius:12px;background:linear-gradient(145deg,#f28bb1,#df4f88);display:grid;place-items:center;color:#fff;font-weight:900;box-shadow:0 5px 12px #e85b9133}
 body.sub .brand strong{font-size:1rem;letter-spacing:.04em;font-family:var(--hfont);color:#573647}
 body.sub .brand small{display:block;color:#573647;font-size:.7rem;margin-top:1px}
-/* F30: カード詳細(配列データベース)の番号・名前・タイプ表記もタイプ色 */
-.dbsheet .tcol.ty-cute,.dbsheet .tcol.ty-cute b,.dbsheet .tyc.ty-cute{color:#ee3f8e!important}
-.dbsheet .tcol.ty-cool,.dbsheet .tcol.ty-cool b,.dbsheet .tyc.ty-cool{color:#2fa7d6!important}
-.dbsheet .tcol.ty-sexy,.dbsheet .tcol.ty-sexy b,.dbsheet .tyc.ty-sexy{color:#8e5fc0!important}
-.dbsheet .tcol.ty-pop,.dbsheet .tcol.ty-pop b,.dbsheet .tyc.ty-pop{color:#f08a1c!important}
 /* F62: 大見出しの余白は上下同じ(22px)・全ページ同じ位置。文字は濃いピンク */
 #pageTitle,h1{margin-top:22px!important;margin-bottom:22px!important;color:#ee3f8e!important}
 #pageTitle:not(:empty)+main{padding-top:0!important}
@@ -231,3 +226,62 @@ body #backFloat{animation:floatIn .25s ease!important}
 .cs.open .cs-list{display:block;opacity:1;transform:none}
 /* 画面(検索/配列/データベース)の切り替えはフェードで入る */
 .view.active{animation:viewIn .25s ease}
+
+
+/* ===== 第7弾 ===== */
+/* B1: MENUは「配列サーチへ戻る」ボタンと同じ大きさ。水色の輪は細く、内側にもピンクの輪 */
+body #menuBtn{width:54px!important;height:54px!important;top:14px!important;right:16px!important;border:2px solid #ee3f8e!important;background:#ec3f8c!important;box-shadow:inset 0 0 0 2px #fff,0 0 0 3px #6dd3f8,0 0 0 5px #ee3f8e,0 0 0 9px rgba(255,255,255,.5)!important}
+body #menuBtn .bars{width:18px!important}
+/* B2-3: 縦ドックの分だけ右に余白を取り、カード名に被らない */
+#arrayDetail .slotlist{padding-right:90px}
+/* C1/C2: 入力したカード欄 */
+.history .hhead{display:flex;justify-content:space-between;align-items:flex-start;gap:10px}
+.history .hacts{display:flex;justify-content:flex-end;margin-top:8px}
+.legendin{display:flex;flex-wrap:wrap;gap:6px;flex:1;min-width:0;padding-top:2px}
+.sidebox{flex:none;display:flex;flex-direction:column;align-items:center;gap:3px;padding:7px 12px 6px;border:2px solid #ee3f8e;border-radius:14px;background:#fff}
+.sidebox #sideTitle{font-family:var(--hfont);font-size:.95rem;color:#ee3f8e!important;border-bottom:3px solid #573647;padding-bottom:2px}
+.sidebox #inputCount{font-size:.74rem;color:#ee3f8e}
+/* C3: 入力欄の「?」は枠の外、「例:」行の左端 */
+.hintrow{margin:6px 2px 0;gap:8px}.hintrow .hint{margin:0}
+.helppop{white-space:pre-line}
+/* F1: 配列データの「?」は配列No.の選択枠の横 */
+.dbbar.dbsel{position:relative;align-items:center}
+.dbbar.dbsel .helpq{flex:none!important;width:26px!important;min-width:26px!important;height:26px!important;padding:0!important;border:2px solid #ee3f8e!important;border-radius:50%!important;background:#fff!important;font-size:15px!important}
+.dbbar.dbsel .helppop{left:auto;right:0}.dbbar.dbsel .helppop::before{left:auto;right:8px}
+/* 全体ルール: カードの向きに関わらず画像の大きさ・枠の大きさは同じ(横向きは向きを変えず、同じ大きさの枠の中に収める) */
+.cbox{background:#f4f5f8}
+.cbox.land img{position:absolute;top:50%;left:50%;width:100%;height:auto;max-width:none;transform:translate(-50%,-50%)}
+.sugimg{width:34px!important;height:50px!important;object-fit:contain;background:#f4f5f8;border-radius:5px}
+.suggestion:has(.sugimg){height:70px;box-sizing:border-box}
+body.hide-sug-img .suggestion{height:auto}
+.rare-opt{height:72px;box-sizing:border-box}
+.slotopt{min-height:101px}
+.dbsheet img[style*="width:92px"]{width:92px!important;height:134px!important;object-fit:contain;background:#f4f5f8}
+.dbsheet img[style*="width:56px"]{width:56px!important;height:82px!important;object-fit:contain;background:#f4f5f8}
+/* D2: 現在位置の枠は、下の文字が読めるくらい透ける */
+.slotlist .slot.current-pos{background:rgba(255,255,255,.16)!important}
+.slotlist .slot.current-pos .slotin{background-color:rgba(255,255,255,.1)!important;background-image:none!important}
+/* D3: 弾の選択枠 */
+.edhead{margin:14px 0 10px!important}.edpick{width:190px}
+/* F2: マス詳細は文字ピンクで統一。タイプ色はバッジと枠だけ */
+.dbsheet .tcol,.dbsheet .tcol b{color:#ee3f8e!important}
+.dbsheet .tyc{display:inline-block;padding:0 10px;border-radius:99px;background:#fff;border:1.5px solid currentColor;font-weight:800;line-height:1.7}
+.dbsheet .tyc.ty-cute{color:#f0509b!important}.dbsheet .tyc.ty-cool{color:#2fa7d6!important}.dbsheet .tyc.ty-sexy{color:#8e5fc0!important}.dbsheet .tyc.ty-pop{color:#f08a1c!important}
+.dbsheet .gridin.ty-cool{border-color:#79cdee!important}.dbsheet .gridin.ty-sexy{border-color:#b794dd!important}.dbsheet .gridin.ty-pop{border-color:#ffb25a!important}
+/* E5: 選択肢を開いている間は最前面(BACKより手前) */
+.cs.open .cs-list{z-index:1200}
+/* E1〜E4: カードリスト */
+body.sub #ov .lbn{width:40px;height:40px}
+body.sub #ov .lbn .chev{width:8px!important;height:8px!important}
+body.sub .seg button{padding:9px 2px;font-size:12px;white-space:nowrap;letter-spacing:0}
+body.sub .panel{padding-top:10px;padding-bottom:10px}
+body.sub .fld{margin-top:8px}body.sub .fld label{margin-bottom:3px}
+body.sub .more{margin-top:10px;padding:8px 10px}
+body.sub #moreBtn{border:1.5px solid #ee3f8e;font-size:15px;font-weight:600;padding:10px 14px;min-height:46px}
+/* B2-1: 前/次のカードの矢印が見切れないよう、ドックのボタンを少し広く・字間を詰める */
+#arrayFabContainer .fab-btn{width:94px!important;min-width:94px!important;padding:0 4px!important;gap:2px!important;white-space:nowrap;overflow:visible}
+#arrayFabContainer .fab-btn .chev{flex:none;margin:0!important}
+#arrayFabContainer .fab-btn .chev.u{transform:rotate(-45deg) translate(1px,1px)}
+#arrayFabContainer .fab-btn .chev.d{transform:rotate(135deg) translate(1px,1px)}
+#arrayDetail .slotlist{padding-right:104px}
+.edpick .cs{display:block;width:100%}.edhead .hwrap{gap:10px}

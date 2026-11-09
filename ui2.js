@@ -10,7 +10,7 @@
  // 画像をタップすると拡大(ふわっと表示)
  function lightbox(src){var o=document.createElement('div');o.id='lbx';o.innerHTML='<img src="'+src+'">';o.onclick=function(){o.style.transition='opacity .22s';o.style.opacity='0';setTimeout(function(){o.remove()},220)};document.body.appendChild(o)}
  document.addEventListener('click',function(e){var im=e.target;if(im&&im.tagName==='IMG'&&im.closest&&im.closest('.dbsheet')){e.stopPropagation();lightbox(im.src)}});
- // 配列データベースのポップアップ: 下からスライドで出て、外をタップまたは閉じるで下に引っ込む
+ // 配列データのポップアップ: 下からスライドで出て、外をタップまたは閉じるで下に引っ込む
  var rm=Element.prototype.remove;
  Element.prototype.remove=function(){
   if(this.classList&&this.classList.contains('dbsheet')&&!this._closing){
@@ -35,7 +35,7 @@
  }).observe(document.body,{childList:true});
 
  // ヘルプ「?」: 丸い?をタップで説明。ほかの場所をタップ/タブ切替で、ふわっと消える
- var HELP={'入力データを保存':'いま入力しているカードの並びを、保存データやデータベースに保存します。保存先は下の欄で選べます。','保存データ':'保存した並びの一覧です。「読込」で入力欄に戻し、「追加」でデータベースに送れます。','配列候補':'入力した並びに合う配列と、この先の高レア枠を表示します。タップすると、その配列の全カードを見られます。連続一致を最優先で表示し、間に未入力カードがある場合も順番が合えば候補に残します。複数のカード名がある枠は、1枠のランダム候補として判定します。','マス目の見かた':'1〜100の各マスは、色でその枠の情報の確かさを表します。緑=確認済み(実際に確かめた)、黄=推定(並びから推測した)、青=不明(登録はしたが確かでない)、白の点線=未登録(まだ何も入れていない)。マスの上のPR・ER・PR★はレアリティです。','入力欄':'カードの取り出し口の左側から出たカードは「左シリンダー」、右側から出たカードは「右シリンダー」のタブで、出た順に1枚ずつ入力します。'};
+ var HELP={'入力データを保存':'いま入力しているカードの並びを、保存データや配列データに保存します。保存先は下の欄で選べます。','保存データ':'保存した並びの一覧です。「読込」で入力欄に戻し、「追加」で配列データに送れます。','配列候補':'入力した並びに合う配列と、この先の高レア枠を表示します。\n・タップすると、その配列の全カードを見られます。\n・連続一致を最優先で表示します。\n・間に未入力カードがある場合も、順番が合えば候補に残します。\n・複数のカード名がある枠は、1枠のランダム候補として判定します。','マス目の見かた':'1〜100の各マスは、色でその枠の情報の確かさを表します。緑=確定(実際に確かめた)、黄=推定(並びから推測した)、青=不明(登録はしたが確かでない)、白の点線=未登録(まだ何も入れていない)。マスの上のPR・ER・PR★はレアリティです。','入力欄':'カードの取り出し口の左側から出たカードは「左シリンダー」、右側から出たカードは「右シリンダー」のタブで、出た順に1枚ずつ入力します。'};
  var ARR_HELP='No.1〜12はそれぞれ独立した100枠の配列です。枠内に複数の名前がある場合は、その中からランダムに1枚排出されます。';
  function helpText(t){return HELP[t]||(/^第\d+弾$/.test(t)?ARR_HELP:'')}
  var curQ=null,helpPop=null;
@@ -46,7 +46,7 @@
   var b=document.createElement('button');b.type='button';b.className='helpq';b.textContent='?';b.dataset.t=t;b.setAttribute('aria-label',t+'の説明');w.appendChild(b)})}
  addHelps();
  var sbx=document.querySelector('.searchbox'),ab=sbx&&sbx.querySelector('.addbtn');
- if(sbx&&ab){var qb=document.createElement('button');qb.type='button';qb.className='helpq';qb.textContent='?';qb.dataset.t='入力欄';qb.setAttribute('aria-label','入力のしかた');sbx.insertBefore(qb,ab)}
+ if(sbx&&ab){var qb=document.createElement('button');qb.type='button';qb.className='helpq';qb.textContent='?';qb.dataset.t='入力欄';qb.setAttribute('aria-label','入力のしかた');var ht=document.querySelector('.hint');if(ht&&ht.parentNode){var row=document.createElement('div');row.className='hwrap hintrow';ht.parentNode.insertBefore(row,ht);row.appendChild(qb);row.appendChild(ht)}else sbx.insertBefore(qb,ab)}
  var ag=document.getElementById('arrayGrid');if(ag&&window.MutationObserver)new MutationObserver(addHelps).observe(ag,{childList:true});
  document.addEventListener('click',function(e){var t=e.target;if(t.closest&&t.closest('.helppop'))return;var q=t.closest&&t.closest('.helpq'),same=q&&q===curQ;closeHelp();if(q&&!same)openHelp(q)});
  document.addEventListener('visibilitychange',closeHelp);window.addEventListener('hashchange',closeHelp);
