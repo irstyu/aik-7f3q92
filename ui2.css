@@ -158,8 +158,6 @@ body.sub .brand small{display:block;color:#573647;font-size:.7rem;margin-top:1px
 .legendrow{display:inline-flex;margin:6px 0 12px;padding:6px 10px;background:#fff;border-radius:12px;box-shadow:0 0 0 1px #f8a5c9}
 .historytop{justify-content:flex-end}
 /* 4: 現在位置の枠は少し透ける */
-.slotlist .slot.current-pos{background:rgba(255,255,255,.55)!important}
-.slotlist .slot.current-pos .slotin{background-color:color-mix(in srgb,var(--sbg,#fff) 55%,transparent)!important}
 /* 6: 配列の続きボタンは右からスライドして出入り */
 @keyframes slideInR{from{transform:translateX(110%);opacity:0}to{transform:none;opacity:1}}
 @keyframes slideOutR{to{transform:translateX(110%);opacity:0}}
@@ -288,7 +286,7 @@ body.sub #moreBtn{border:1.5px solid #ee3f8e;font-size:15px;font-weight:600;padd
 /* H5: 前/次のカードの矢印を上下中央に(山形は見た目が片側に寄るので補正) */
 #arrayFabContainer .fab-btn{align-items:center}
 #arrayFabContainer .fab-btn .chev.u{transform:translateY(3px) rotate(-45deg)}
-#arrayFabContainer .fab-btn .chev.d{transform:translateY(-3px) rotate(135deg)}
+#arrayFabContainer .fab-btn .chev.d{transform:translateY(1px) rotate(135deg)}
 /* H7: 横向きカードの後ろの板(白/グレー)を消す。枠の大きさは同じのまま */
 .cbox.land{background:transparent!important;box-shadow:none!important}
 .cbox.land img{border-radius:5px;box-shadow:0 2px 5px rgba(0,0,0,.15)}
@@ -309,3 +307,19 @@ body.sub .pm i{width:12px!important;top:5px!important;height:2px!important}
 /* H15/H16: タイプバッジは小さく、背景=タイプ色・文字=白 */
 .dbsheet .tyc{display:inline-block;padding:0 8px;border-radius:99px;border:0;font-size:10.5px;font-weight:800;line-height:1.7;color:#fff!important;vertical-align:middle}
 .dbsheet .tyc.ty-cute{background:#f0509b}.dbsheet .tyc.ty-cool{background:#2fa7d6}.dbsheet .tyc.ty-sexy{background:#8e5fc0}.dbsheet .tyc.ty-pop{background:#f08a1c}
+
+
+/* ===== 第9弾 ===== */
+/* I1: 「入力したカード」2段目=左に枚数・右に1つ戻す/クリアを1行に */
+.history .hhead{gap:8px}
+.history .hacts{display:flex;justify-content:space-between;align-items:center;margin-top:4px;margin-bottom:2px}
+.history .hacts #inputCount{font-size:.76rem;color:#ee3f8e;font-weight:700}
+.history .hleft{gap:0}
+.history .chips{margin-top:6px}
+/* I4: MENUが×のときは白リング1本だけ */
+body #menuBtn.open{border:3px solid #fff!important;box-shadow:0 4px 12px rgba(232,63,140,.3)!important}
+/* I5: タイプバッジを横の文字の中央に */
+.dbsheet .tyc{transform:translateY(1.5px)}
+/* I6: 「くわしくさがす」の+/-: 開く(+→-)は右回り180°、閉じる(-→+)は左回り180° */
+body.sub .pm{transition:transform .35s ease}
+body.sub #moreBtn.open .pm{transform:rotate(180deg)}
