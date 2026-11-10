@@ -204,7 +204,7 @@ var ti=window.toggleImages;window.toggleImages=function(){
   var hb=document.querySelector('#arrayDetail .arrayhead .badge');if(hb)hb.textContent='現在位置:'+(idx+1)+'枠目'};
  var bv=true;if(window.IntersectionObserver&&hd){new IntersectionObserver(function(es){bv=es[0].isIntersecting;vis()},{threshold:0.05}).observe(hd)}
  function curView(){var d=$('dbView'),a=$('arraysView');return d&&d.classList.contains('active')?'db':(a&&a.classList.contains('active')?'arrays':'search')}
- function vis(){var v=curView();tp.style.display=(v==='db'||v==='search')?'flex':'none';tp.style.bottom=(v==='search'&&contOn()&&currentActiveArray)?(tuck?'calc(92px + env(safe-area-inset-bottom))':'calc(78px + env(safe-area-inset-bottom))'):'';bk.style.display=v==='search'?'none':'flex';hf.classList.toggle('show',v!=='search'&&!bv);
+ function vis(){var v=curView();tp.style.display=(v==='db'||v==='search')?'flex':'none';tp.style.bottom=(v==='search'&&contOn()&&currentActiveArray&&!tuck)?'calc(78px + env(safe-area-inset-bottom))':'';bk.style.display=v==='search'?'none':'flex';hf.classList.toggle('show',v!=='search'&&!bv);
   pt.textContent=v==='db'?'配列データ':(v==='arrays'?'配列詳細':'');
   var cok=(v==='search'&&contOn()&&currentActiveArray);cw.style.display=(cok&&!tuck)?'flex':'none';ctab.style.display=(cok&&tuck)?'flex':'none'}
  if(window.MutationObserver)new MutationObserver(vis).observe(document.body,{subtree:true,attributes:true,attributeFilter:['class']});vis();setInterval(vis,700);

@@ -232,8 +232,6 @@ body #backFloat{animation:floatIn .25s ease!important}
 /* B1: MENUは「配列サーチへ戻る」ボタンと同じ大きさ。水色の輪は細く、内側にもピンクの輪 */
 body #menuBtn{width:54px!important;height:54px!important;top:14px!important;right:16px!important;border:2px solid #ee3f8e!important;background:#ec3f8c!important;box-shadow:inset 0 0 0 2px #fff,0 0 0 3px #6dd3f8,0 0 0 5px #ee3f8e,0 0 0 9px rgba(255,255,255,.5)!important}
 body #menuBtn .bars{width:18px!important}
-/* B2-3: 縦ドックの分だけ右に余白を取り、カード名に被らない */
-#arrayDetail .slotlist{padding-right:90px}
 /* C1/C2: 入力したカード欄 */
 .history .hhead{display:flex;justify-content:space-between;align-items:flex-start;gap:10px}
 .history .hacts{display:flex;justify-content:flex-end;margin-top:8px}
@@ -258,15 +256,10 @@ body.hide-sug-img .suggestion{height:auto}
 .slotopt{min-height:101px}
 .dbsheet img[style*="width:92px"]{width:92px!important;height:134px!important;object-fit:contain;background:#f4f5f8}
 .dbsheet img[style*="width:56px"]{width:56px!important;height:82px!important;object-fit:contain;background:#f4f5f8}
-/* D2: 現在位置の枠は、下の文字が読めるくらい透ける */
-.slotlist .slot.current-pos{background:rgba(255,255,255,.16)!important}
-.slotlist .slot.current-pos .slotin{background-color:rgba(255,255,255,.1)!important;background-image:none!important}
 /* D3: 弾の選択枠 */
 .edhead{margin:14px 0 10px!important}.edpick{width:190px}
 /* F2: マス詳細は文字ピンクで統一。タイプ色はバッジと枠だけ */
 .dbsheet .tcol,.dbsheet .tcol b{color:#ee3f8e!important}
-.dbsheet .tyc{display:inline-block;padding:0 10px;border-radius:99px;background:#fff;border:1.5px solid currentColor;font-weight:800;line-height:1.7}
-.dbsheet .tyc.ty-cute{color:#f0509b!important}.dbsheet .tyc.ty-cool{color:#2fa7d6!important}.dbsheet .tyc.ty-sexy{color:#8e5fc0!important}.dbsheet .tyc.ty-pop{color:#f08a1c!important}
 .dbsheet .gridin.ty-cool{border-color:#79cdee!important}.dbsheet .gridin.ty-sexy{border-color:#b794dd!important}.dbsheet .gridin.ty-pop{border-color:#ffb25a!important}
 /* E5: 選択肢を開いている間は最前面(BACKより手前) */
 .cs.open .cs-list{z-index:1200}
@@ -283,5 +276,36 @@ body.sub #moreBtn{border:1.5px solid #ee3f8e;font-size:15px;font-weight:600;padd
 #arrayFabContainer .fab-btn .chev{flex:none;margin:0!important}
 #arrayFabContainer .fab-btn .chev.u{transform:rotate(-45deg) translate(1px,1px)}
 #arrayFabContainer .fab-btn .chev.d{transform:rotate(135deg) translate(1px,1px)}
-#arrayDetail .slotlist{padding-right:104px}
 .edpick .cs{display:block;width:100%}.edhead .hwrap{gap:10px}
+
+
+/* ===== 第8弾(第7弾の実機確認の修正 H1〜H16) ===== */
+/* H1/H3: シリンダー文字はアンダーバー無し・Zen Maru Gothic */
+.sidebox #sideTitle{border-bottom:0!important;padding-bottom:0!important;font-family:"Zen Maru Gothic",system-ui,sans-serif!important;font-weight:800}
+/* H2: 入力済みの枚数はバッジの下 */
+.history .hleft{display:flex;flex-direction:column;gap:6px;flex:1;min-width:0}
+.history .hleft #inputCount{font-size:.76rem;color:#ee3f8e;font-weight:700}
+/* H5: 前/次のカードの矢印を上下中央に(山形は見た目が片側に寄るので補正) */
+#arrayFabContainer .fab-btn{align-items:center}
+#arrayFabContainer .fab-btn .chev.u{transform:translateY(3px) rotate(-45deg)}
+#arrayFabContainer .fab-btn .chev.d{transform:translateY(-3px) rotate(135deg)}
+/* H7: 横向きカードの後ろの板(白/グレー)を消す。枠の大きさは同じのまま */
+.cbox.land{background:transparent!important;box-shadow:none!important}
+.cbox.land img{border-radius:5px;box-shadow:0 2px 5px rgba(0,0,0,.15)}
+.sugimg,.dbsheet img[style*="width:92px"],.dbsheet img[style*="width:56px"]{background:transparent!important}
+/* H8: 左上ボタンもMENUと同じ大きさ+半透明の白ふち */
+body #homeFloat,body #menuBack{box-sizing:border-box!important;width:54px!important;height:54px!important;top:14px!important;left:16px!important;border:2px solid #ee3f8e!important;box-shadow:inset 0 0 0 2px #fff,0 0 0 3px #fff,0 0 0 5px #f8a5c9,0 0 0 9px rgba(255,255,255,.5)!important}
+/* H9: MENUの中身(三本線と文字)を中央に */
+body #menuBtn{gap:4px!important;justify-content:center!important;align-items:center!important}
+body #menuBtn .bars{margin:6px 0 6px!important}
+body #menuBtn span:not(.bars):not(.x){padding-left:.05em;line-height:1}
+/* H10: ×のときは水色リングをなくして白リングだけ */
+body #menuBtn.open{box-shadow:inset 0 0 0 2px #fff,0 0 0 3px #fff,0 0 0 5px #ee3f8e,0 0 0 9px rgba(255,255,255,.5)!important}
+/* H11: 続きを閉じるとTOPは下(前回の動き)。開くタブはTOPの上に置いて重ならない */
+#contTab{bottom:calc(64px + env(safe-area-inset-bottom))!important}
+/* H14: 「くわしくさがす」の+/-は選択欄の矢印と同じ大きさ */
+body.sub .pm{width:12px!important;height:12px!important}
+body.sub .pm i{width:12px!important;top:5px!important;height:2px!important}
+/* H15/H16: タイプバッジは小さく、背景=タイプ色・文字=白 */
+.dbsheet .tyc{display:inline-block;padding:0 8px;border-radius:99px;border:0;font-size:10.5px;font-weight:800;line-height:1.7;color:#fff!important;vertical-align:middle}
+.dbsheet .tyc.ty-cute{background:#f0509b}.dbsheet .tyc.ty-cool{background:#2fa7d6}.dbsheet .tyc.ty-sexy{background:#8e5fc0}.dbsheet .tyc.ty-pop{background:#f08a1c}
