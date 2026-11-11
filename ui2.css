@@ -317,9 +317,11 @@ body.sub .pm i{width:12px!important;top:5px!important;height:2px!important}
 .history .hleft{gap:0}
 .history .chips{margin-top:6px}
 /* I4: MENUが×のときは白リング1本だけ */
-body #menuBtn.open{border:3px solid #fff!important;box-shadow:0 4px 12px rgba(232,63,140,.3)!important}
+body #menuBtn.open{border:3px solid #fff!important;box-shadow:0 0 0 2px #ee3f8e,0 0 0 9px rgba(255,255,255,.5)!important}
 /* I5: タイプバッジを横の文字の中央に */
-.dbsheet .tyc{transform:translateY(1.5px)}
-/* I6: 「くわしくさがす」の+/-: 開く(+→-)は右回り180°、閉じる(-→+)は左回り180° */
-body.sub .pm{transition:transform .35s ease}
-body.sub #moreBtn.open .pm{transform:rotate(180deg)}
+.dbsheet .tyc{transform:translateY(.75px)}
+/* J3: +/-は縦棒だけが回転(アイコン全体は回転しない) */
+
+/* J4: 1つ戻す=水色系(保存データの追加/読込と同じ)、クリア=白地+赤文字(削除と同じ) */
+.history .actions .ghost.undo{background:#e4f8ff!important;color:#075b70!important;border-color:#94dced!important}
+.history .actions .ghost.clr{background:#fff!important;color:#d32f2f!important;border-color:#e0b4ae!important}
