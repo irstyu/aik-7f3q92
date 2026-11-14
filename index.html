@@ -235,6 +235,7 @@ body{background-color:#fff6fa!important;background-image:url("data:image/svg+xml
 <main>
 <section id="searchView" class="view active">
 <div class="hero"><div class="eyebrow">CARD ARRAY FINDER</div><h1>次のレアカードを見つけよう。</h1><p>出たカードを順番に入力すると、左右それぞれの配列候補を絞り込めます。</p></div>
+<div id="sessBar" class="sessbar"></div>
 <div class="edition"><label for="editionSelect">弾を選択</label><select id="editionSelect"><option value="1">第1弾</option><option value="2" disabled>第2弾(データ追加待ち)</option></select><button id="sugImgBtn" class="mini" type="button" style="margin-left:auto">候補画像 ON</button></div><div class="searchbox"><input id="cardSearch" autocomplete="off" placeholder="番号・カード名で検索"><button class="addbtn" onclick="addSelected()">追加</button></div>
 <div id="suggestions" class="suggestions"></div>
 <div class="switchrow">
@@ -242,6 +243,7 @@ body{background-color:#fff6fa!important;background-image:url("data:image/svg+xml
 <button class="allbtn" onclick="showAllArrays()">全配列表</button>
 <button id="rightTab" class="tab active" onclick="switchSide('right')"><span class="circle">右</span>シリンダー</button>
 </div>
+<button type="button" class="parq-btn" data-open="全配列のパラレル早見を見る▾" data-close="パラレル早見をたたむ▴" onclick="toggleColl(this)">全配列のパラレル早見を見る▾</button><div class="coll"><div class="colli"><div id="parQuickBody" class="parquick"></div></div></div>
 <div class="resulttitle" id="histTitle"><h2>入力したカード</h2></div>
 <div class="history">
 <div class="historytop hhead"><div class="hleft"><div class="legendin"><span class="badge par">PR★</span><span class="badge pr">PR</span><span class="badge er">ER</span><span class="badge r">R</span><span class="badge n">N</span></div></div><div class="sidebox"><strong id="sideTitle">右シリンダー</strong></div></div>
@@ -270,6 +272,7 @@ body{background-color:#fff6fa!important;background-image:url("data:image/svg+xml
   <button class="fab-btn" onclick="goPrevCard()" title="前のカードへ"><i class="chev u"></i>前のカード</button>
   <button class="fab-btn" onclick="goNextCard()" title="次のカードへ">次のカード<i class="chev d"></i></button>
   <button class="fab-btn primary" onclick="scrollToCurrentPos()" title="現在位置へ戻る">現在位置</button>
+  <button class="fab-btn" onclick="jumpToParallel()" title="パラレルの枠へ">パラレルへ</button>
   <button class="fab-btn" onclick="scrollToTop()" title="ページトップへ"><i class="chev u"></i>TOP</button>
 </div>
 
@@ -372,7 +375,13 @@ function bestMatch(slots,input){
  states.sort((a,b)=>a.gaps-b.gaps||a.last-b.last);
  return states[0]||null;
 }
-function nextRare(slots,last){const out=[];for(let i=last+1;i<slots.length;i++)if(['PR','ER','PAR'].includes(slots[i].rarity))out.push({slot:slots[i],distance:i-last});return out.slice(0,6)}
+function nextRare(slots,last){const all=[];for(let i=last+1;i<slots.length;i++)if(['PR','ER','PAR'].includes(slots[i].rarity))all.push({slot:slots[i],distance:i-last});const pi=all.findIndex(r=>r.slot.rarity==='PAR');const cut=pi>=0?pi+1:Math.min(6,all.length);return{main:all.slice(0,cut),rest:all.slice(cut)}}
+function parInfo(slots){const idx=[];slots.forEach((s,i)=>{if(s.rarity==='PAR')idx.push(i)});if(!idx.length)return null;const p=idx[0],o=slots[p].options;return{p:p,n:p+1,name:o.length?o[0].name:'カード名未記載',more:Math.max(0,o.length-1),names:o.map(x=>x.name)}}
+function toggleColl(b){const c=b.nextElementSibling;if(!c)return;const o=c.classList.toggle('open');b.classList.toggle('open',o);if(b.dataset.open)b.textContent=o?b.dataset.close:b.dataset.open}
+function rareLineHtml(r){const optHtml=r.slot.options.map(o=>{const img=getCardImagePath(o.id,o.star);const imgTag=img?cbox(img,o,'thumb'):'';return `<div class="rare-opt">${imgTag}<span>${o.star?'PR★ ':''}${o.id}:${esc(o.name)}</span></div>`}).join('');return `<div class="rareline rarity-${r.slot.rarity}"><span class="distance">あと${r.distance}枚</span>${badge(r.slot.rarity)}<div class="optname-container">${optHtml||'カード名未記載'}</div></div>`}
+function jumpToParallel(){if(!currentActiveArray)return;const sl=arrays[currentActiveArray],idx=[];sl.forEach((s,i)=>{if(s.rarity==='PAR')idx.push(i)});if(!idx.length)return;let t=idx.find(i=>i>currentActiveSlotIndex);if(t===undefined)t=idx[0];const el=document.getElementById('slot-'+t);if(el){el.scrollIntoView({behavior:'smooth',block:'center'});el.classList.add('flash');setTimeout(()=>el.classList.remove('flash'),1700)}}
+function jumpPar(no,last){viewArrayDetail(no,last);setTimeout(jumpToParallel,500)}
+function parQuick(){const b=document.getElementById('parQuickBody');if(!b)return;b.innerHTML=Object.keys(arrays).map(n=>{const p=parInfo(arrays[n]);return p?`<div class="pqrow"><b>No.${n}</b><span>PR★${esc(p.name)}${p.more?'ほか'+p.more+'種':''}<small>(${p.n}枠目)</small></span></div>`:''}).join('')}
 
 function render(){
  const hist=histories[currentSide];$('sideTitle').textContent=currentSide==='right'?'右シリンダー':'左シリンダー';$('inputCount').textContent=hist.length+'枚入力済み';
@@ -383,30 +392,18 @@ function render(){
  if(!ranked.length){$('results').className='empty';$('results').textContent='一致する配列が見つかりません。カードの入力間違いがないか確認してね。';return}
  $('results').className='';
  $('results').innerHTML=ranked.map(x=>{
-  const m=Object.assign({},x.match), ov=window.advOf?advOf(x.no):null; if(ov!==null)m.last=ov; const rare=nextRare(x.slots,m.last);
-  return `<button type="button" class="cardresult${m.gaps===0?' cont':''}" onclick="viewArrayDetail('${x.no}', ${m.last})"><div class="crin">
-    <div class="rhead">
-      <strong>No.${x.no}</strong>
-      <span class="matchtype ${m.gaps?'gap':''}">${m.gaps===0?' 連続一致':'順番一致・間に'+m.gaps+'枠'}</span>
-    </div>
+  const m=Object.assign({},x.match), ov=window.advOf?advOf(x.no):null; if(ov!==null)m.last=ov; const rr=nextRare(x.slots,m.last), pi=parInfo(x.slots);
+  let parHtml='';
+  if(pi){const passed=pi.p<=m.last, d=pi.p-m.last;
+   parHtml=`<div class="parline"><span class="parbadge ${passed?'done':'todo'}">${passed?'パラレル通過済み('+pi.n+'枠目)':'パラレルまだ(あと'+d+'枚)'}</span><span class="parname">PR★${esc(pi.name)}${pi.more?` <button type="button" class="parmore" data-open="ほか${pi.more}種▾" data-close="ほか${pi.more}種▴" onclick="event.stopPropagation();toggleColl(this)">ほか${pi.more}種▾</button><div class="coll"><div class="colli"><div class="parnames">${pi.names.slice(1).map(n=>'PR★'+esc(n)).join('<br>')}</div></div></div>`:''}</span><button type="button" class="parjump" onclick="event.stopPropagation();jumpPar('${x.no}',${m.last})">パラレルまでジャンプ</button></div>`}
+  const restHtml=rr.rest.length?`<button type="button" class="restbtn" data-open="続きを表示(${rr.rest.length}件)" data-close="たたむ" onclick="event.stopPropagation();toggleColl(this)">続きを表示(${rr.rest.length}件)</button><div class="coll"><div class="colli">${rr.rest.map(rareLineHtml).join('')}</div></div>`:'';
+  return `<div role="button" tabindex="0" class="cardresult${m.gaps===0?' cont':''}" onclick="viewArrayDetail('${x.no}', ${m.last})"><div class="crin">
+    <div class="rhead"><strong>No.${x.no}</strong><span class="matchtype ${m.gaps?'gap':''}">${m.gaps===0?' 連続一致':'順番一致・間に'+m.gaps+'枠'}</span></div>
     <div class="meta">${hist.length}枚が一致 / 現在位置:${m.last+1}枠目</div>
+    ${parHtml}
     <div class="tap-hint">タップでこの配列の現在位置&全カードを見る</div>
-    <div class="rares">
-      <b>この先の高レア枠</b>
-      ${rare.length?rare.map(r=>{
-        const optHtml = r.slot.options.map(o=>{
-          const img = getCardImagePath(o.id, o.star);
-          const imgTag = img ? cbox(img,o,'thumb') : '';
-          return `<div class="rare-opt">${imgTag}<span>${o.star?'PR★ ':''}${o.id}:${esc(o.name)}</span></div>`;
-        }).join('');
-        return `<div class="rareline rarity-${r.slot.rarity}">
-          <span class="distance">あと${r.distance}枚</span>
-          ${badge(r.slot.rarity)}
-          <div class="optname-container">${optHtml||'カード名未記載'}</div>
-        </div>`;
-      }).join(''):'<div class="meta">この先に高レア枠はありません</div>'}
-    </div>
-  </div></button>`;
+    <div class="rares"><b>この先の高レア枠</b>${rr.main.length?rr.main.map(rareLineHtml).join(''):'<div class="meta">この先に高レア枠はありません</div>'}${restHtml}</div>
+  </div></div>`;
  }).join('');
 }
 
@@ -420,11 +417,13 @@ function saveCurrentHistory() {
     alert('保存するカードが入力されていません。');
     return;
   }
-  const name = prompt('保存する名前を入力してください(例:11/2 右シリンダー)', new Date().toLocaleString() + ' ' + (currentSide==='right'?'右':'左'));
+  const _d=new Date(), _lb=(window.curSessLabel?curSessLabel():'');
+  const defName=(_d.getMonth()+1)+'/'+_d.getDate()+' '+(_lb?_lb+'・':'')+(currentSide==='right'?'右':'左')+'('+hist.length+'枚)'+(hist.some(c=>c.star)?'★':'☆');
+  const name = prompt('保存する名前を入力してください(自動で付けた名前を変えられます。★=パラレルが出た ☆=まだ)', defName);
   if (!name) return;
 
   const saved = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
-  saved.push({ name: name, side: currentSide, data: [...hist] });
+  saved.push({ name: name, side: currentSide, data: [...hist], sess: (window.curSessLabel?curSessLabel():'') });
   localStorage.setItem(STORAGE_KEY, JSON.stringify(saved));
   alert('保存しました！');
   renderSavedList();
@@ -546,7 +545,7 @@ function arrGridHtml(active){
  if(!eds.length)eds.push({v:'1',l:'第1弾'});
  const sel=`<div class="arrayhead edhead"><div class="hwrap"><div class="edpick"><select id="arrEdSel" onchange="setArrEd(this.value)">${eds.map(e=>`<option value="${e.v}"${e.v===arrEd?' selected':''}>${e.l}</option>`).join('')}</select></div><button type="button" class="helpq" data-t="第1弾" aria-label="配列のしくみの説明">?</button></div></div>`;
  const E=EDITION_ARRAYS[arrEd];
- const body=E?`<div class="arrgrid">${Object.keys(E).map(num=>`<button class="arrbtn${num===active?' active':''}" style="${num===active?'border-color:var(--accent);background:#fff0f6;':''}" onclick="showArray('${num}', -1)"><b>No.${num}</b><small>100枠</small></button>`).join('')}</div>`:'<div class="empty">この弾の配列はまだありません。</div>';
+ const body=E?`<div class="arrgrid">${Object.keys(E).map(num=>`<button class="arrbtn${num===active?' active':''}" style="${num===active?'border-color:var(--accent);background:#fff0f6;':''}" onclick="showArray('${num}', -1)"><b>No.${num}</b><small class="arrpar">${(()=>{const p=parInfo(E[num]);return p?'PR★'+esc(p.name)+(p.more?'ほか'+p.more+'種':'')+'・'+p.n+'枠目':'100枠'})()}</small></button>`).join('')}</div>`:'<div class="empty">この弾の配列はまだありません。</div>';
  return `<div class="edsec">${sel}${body}</div>`;
 }
 function showAllArrays(){
@@ -621,6 +620,7 @@ var b=window.backToSearch;window.backToSearch=function(){var r=b.apply(this,argu
 <script src="app.js"></script>
 <script src="db.js"></script>
 <script src="ui2.js"></script>
+<script src="session.js"></script>
 <script>if('serviceWorker' in navigator){window.addEventListener('load',function(){navigator.serviceWorker.register('sw.js').catch(function(){})})}</script>
 </body>
 </html>

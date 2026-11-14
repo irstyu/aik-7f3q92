@@ -325,3 +325,54 @@ body #menuBtn.open{border:3px solid #fff!important;box-shadow:0 0 0 2px #ee3f8e,
 /* J4: 1つ戻す=水色系(保存データの追加/読込と同じ)、クリア=白地+赤文字(削除と同じ) */
 .history .actions .ghost.undo{background:#e4f8ff!important;color:#075b70!important;border-color:#94dced!important}
 .history .actions .ghost.clr{background:#fff!important;color:#d32f2f!important;border-color:#e0b4ae!important}
+
+/* ===== v37: 入力セッション・パラレル表示 ===== */
+/* 開閉(出入りは同じ動きで) */
+.coll{display:grid;grid-template-rows:0fr;transition:grid-template-rows .3s cubic-bezier(.4,0,.2,1)}
+.coll.open{grid-template-rows:1fr}
+.coll>.colli{overflow:hidden;min-height:0}
+/* 上部の筐体ラベル */
+.sessbar{display:flex;align-items:center;gap:10px;margin:10px 0;padding:8px 12px;background:#fff;border:2px solid #ee3f8e;border-radius:14px}
+.sessbar:empty{display:none}
+.sessbar .stext{flex:1;min-width:0;display:flex;flex-direction:column}
+.sessbar .stext b{color:#ee3f8e;font-size:1rem;word-break:break-all}
+.sessbar .stext small,.sitem .stext small{color:#70778c;font-size:.74rem}
+.schip{flex:none;width:22px;height:22px;border-radius:50%;box-shadow:0 0 0 2px #fff,0 0 0 3px rgba(32,36,58,.18)}
+/* 選択画面 */
+#sessOv{position:fixed;inset:0;z-index:1500;display:flex;align-items:center;justify-content:center;padding:16px;background:rgba(255,246,250,.97);animation:viewIn .22s ease}
+#sessOv.out{animation:floatOut .22s ease forwards;pointer-events:none}
+#sessOv .spanel{width:100%;max-width:420px;max-height:90vh;overflow:auto;background:#fff;border:2px solid #ee3f8e;border-radius:18px;padding:16px;box-shadow:0 10px 30px rgba(238,63,142,.18)}
+#sessOv h3{margin:0 0 10px;color:#ee3f8e;font-family:var(--hfont);font-size:1.05rem}
+#sessOv .snote{color:#70778c;font-size:.85rem}
+#sessOv .slist{display:flex;flex-direction:column;gap:8px;margin-bottom:14px}
+.sitem{display:flex;align-items:center;gap:10px;padding:10px 12px;border:1.5px solid #f8a5c9;border-radius:12px;background:#fff;cursor:pointer}
+.sitem.on{background:#fff0f6;border-color:#ee3f8e}
+.sitem .stext{flex:1;min-width:0;display:flex;flex-direction:column}
+.sitem .stext b{color:#ee3f8e;word-break:break-all}
+.sitem .sdel{flex:none;width:30px;height:30px;border-radius:50%;border:1px solid #e0b4ae;background:#fff;color:#d32f2f;font-size:1.1rem;line-height:1;padding:0}
+#sessOv .snew{border-top:1.5px dashed #f8a5c9;padding-top:12px}
+#sessOv .snew b{color:#ee3f8e}
+#sessOv .snew label{display:block;margin:8px 0 4px;color:#ee3f8e;font-size:13px;font-weight:800}
+#sessOv .snew input{width:100%;box-sizing:border-box;font-size:16px;padding:11px 14px;border:1.5px solid #ee3f8e;border-radius:99px;color:#ee3f8e;background:#fff;font-family:inherit}
+#sessOv .srow{display:flex;justify-content:flex-end;margin-top:12px}
+/* パラレル情報(配列候補) */
+.parline{display:flex;flex-wrap:wrap;align-items:center;gap:6px 8px;margin-top:8px}
+.parbadge{display:inline-block;padding:3px 10px;border-radius:99px;font-size:.76rem;font-weight:800;white-space:nowrap}
+.parbadge.done{background:#dff3e4;color:#1f7a45;border:1.5px solid #8fd0a2}
+.parbadge.todo{background:#ffe7c2;color:#9a5a00;border:1.5px solid #f0b95a}
+.parname{flex:1;min-width:0;font-size:.82rem;font-weight:700;color:#ee3f8e;word-break:break-all}
+.parmore{border:1px solid #f8a5c9;background:#fff;color:#ee3f8e;border-radius:99px;padding:1px 8px;font-size:.72rem;font-weight:800}
+.parnames{margin-top:4px;font-size:.78rem;font-weight:600;line-height:1.6}
+.parjump,.restbtn,.parq-btn{border:1.5px solid #ee3f8e;background:#fff;color:#ee3f8e;border-radius:99px;font-weight:800;font-family:inherit}
+.parjump{padding:5px 12px;font-size:.76rem}
+.restbtn{display:block;width:100%;margin-top:8px;padding:8px;font-size:.8rem}
+.parq-btn{display:block;width:100%;margin:10px 0;padding:10px 14px;font-size:.85rem;text-align:left}
+.parquick{display:flex;flex-direction:column;gap:6px;padding:8px 2px 2px}
+.pqrow{display:flex;gap:10px;align-items:baseline;padding:7px 10px;background:#fff;border:1.5px solid #f8a5c9;border-radius:10px;font-size:.82rem;color:#ee3f8e}
+.pqrow b{flex:none;min-width:42px}
+.pqrow small{margin-left:4px;color:#70778c}
+/* 配列詳細のボタン: 2段(No./パラレル名・枠) */
+.arrbtn .arrpar{display:block;margin-top:3px;font-size:.7rem;line-height:1.35;color:#ee3f8e;overflow-wrap:anywhere}
+/* パラレルへジャンプしたとき、その枠を一瞬光らせる */
+@keyframes slotFlash{0%,100%{box-shadow:0 0 0 0 rgba(238,63,142,0)}30%{box-shadow:0 0 0 8px rgba(238,63,142,.35)}}
+.slot.flash{animation:slotFlash 1.7s ease}

@@ -5,8 +5,8 @@ function get(k){try{return localStorage.getItem(k)}catch(e){return null}}functio
 var KEY='aikatsu_input_v1',adv={sig:'',map:{}};
 function sig(){return['left','right'].map(function(s){return histories[s].map(function(c){return c.id+':'+c.name}).join(',')}).join('|')}
 window.advOf=function(no){return(adv.sig===sig()&&adv.map[no]!==undefined)?adv.map[no]:null};
-function persist(){try{localStorage.setItem(KEY,JSON.stringify({left:histories.left,right:histories.right,side:currentSide,adv:adv}))}catch(e){}}
-try{var s0=JSON.parse(localStorage.getItem(KEY));if(s0){
+function persist(){try{sessionStorage.setItem(KEY,JSON.stringify({left:histories.left,right:histories.right,side:currentSide,adv:adv}))}catch(e){}}
+try{var s0=JSON.parse(sessionStorage.getItem(KEY));if(s0){
  histories.left.splice(0,histories.left.length,...(s0.left||[]));histories.right.splice(0,histories.right.length,...(s0.right||[]));
  if(s0.adv&&s0.adv.map)adv=s0.adv;switchSide(s0.side==='left'?'left':'right')}}catch(e){}
 var r0=window.render;window.render=function(){var v=r0.apply(this,arguments);persist();return v};
