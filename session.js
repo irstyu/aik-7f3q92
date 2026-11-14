@@ -38,7 +38,7 @@
   ov=document.createElement('div');ov.id='sessOv';
   var items=list.map(function(s){return'<div class="sitem'+(cur&&cur.id===s.id?' on':'')+'" data-id="'+s.id+'"><span class="schip" style="background:'+color(s)+'"></span><div class="stext"><b>'+esc(label(s))+'</b><small>'+counts(s)+' / '+when(s.updated)+'</small></div><button type="button" class="sdel" data-del="'+s.id+'" title="削除">×</button></div>'}).join('');
   ov.innerHTML='<div class="spanel"><h3>どの筐体を入力しますか?</h3>'+(items?'<div class="slist">'+items+'</div>':'<p class="snote">まだ入力の記録がありません。下の欄から新しく始めてください。</p>')+
-   '<div class="snew"><b>新しく始める</b><label>店名</label><input id="sessShop" list="sessShops" placeholder="例: 下田モーリー" autocomplete="off"><datalist id="sessShops">'+(S.shops||[]).map(function(n){return'<option value="'+esc(n)+'">'}).join('')+'</datalist><label>号機</label><input id="sessUnit" placeholder="例: 2" autocomplete="off"><div class="srow"><button type="button" class="addbtn" id="sessMake">この筐体で始める</button></div></div>'+
+   '<div class="snew"><b>新しく始める</b><label>店名</label><input id="sessShop" list="sessShops" placeholder="例: モーリーファンタジー むさし村山" autocomplete="off"><datalist id="sessShops">'+(S.shops||[]).map(function(n){return'<option value="'+esc(n)+'">'}).join('')+'</datalist><label>号機</label><input id="sessUnit" placeholder="例: 2" autocomplete="off"><div class="srow"><button type="button" class="addbtn" id="sessMake">この筐体で始める</button></div></div>'+
    (cur?'<div class="srow"><button type="button" class="ghost" id="sessClose">閉じる</button></div>':'')+'</div>';
   document.body.appendChild(ov);
   ov.onclick=function(e){var d=e.target.closest('[data-del]');
