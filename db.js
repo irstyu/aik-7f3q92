@@ -37,7 +37,7 @@ function draw(){
  var c={confirmed:0,estimated:0,unknown:0,none:0},g='';
  for(var s=1;s<=100;s++){var e=eff(arr,s),st=e.src==='none'?'none':e.cert;c[st]++;
   g+='<button class="dbc r-'+e.rarity+' st-'+st+'" data-s="'+s+'"><b>'+s+'</b><span class="rr">'+(e.rarity==='PAR'?'PR★':(e.rarity||''))+'</span><span class="stl">'+STL[st]+'</span>'+(e.ids&&e.ids.length?'<small>'+e.ids[0]+(e.ids.length>1?'+':'')+'</small>':'')+'</button>'}
- $('dbGrid').innerHTML=g;
+ $('dbGrid').innerHTML=g;if(window.__dbk!==ed+'-'+arr){window.__dbk=ed+'-'+arr;var _g=$('dbGrid');_g.classList.remove('swap');void _g.offsetWidth;_g.classList.add('swap')}
  $('dbProg').innerHTML='<b style="color:'+(c.confirmed===100?'#e85b91':'inherit')+'">配列 No.'+arr+'</b><div class="stcount">'+['confirmed','estimated','unknown','none'].map(function(x){return'<span class="stc st-'+x+'">'+STL[x]+' '+c[x]+'</span>'}).join('')+'</div>';
  $('dbBk').textContent='v'+VER+' '+(db.lastBackup?'最後の書き出し:'+db.lastBackup:'まだ書き出していません。こまめに書き出して保管してください。');drawObs()}
 $('dbEd').onchange=function(){ed=this.value;arr='1';draw()};$('dbArr').onchange=function(){arr=this.value;draw()};
@@ -106,10 +106,13 @@ function obsCards(hs){return hs.map(function(c){return{id:c.id,name:c.name,rarit
 function stockInfo(){var t=$('stockInfo');if(!t)return;var e=selEd();if(db.editions[e]&&db.editions[e].locked){t.textContent='この弾は配列が確定済みのため、配列データへの送信は不要です。';return}
  t.textContent='この弾の送信済み:'+(db.obsSeq||[]).filter(function(x){return x.ed===e}).length+'件の並び'}
 window.sendObs=function(){var e=selEd();if(db.editions[e]&&db.editions[e].locked){note('この弾は配列が確定済みのため、配列データへ送信しません。');return false}
- var H=typeof histories!=='undefined'?histories:null,sd=typeof currentSide!=='undefined'?currentSide:'right',hs=H?H[sd]:[];if(!hs||!hs.length){note('入力中のカードがありません。');return false}
- db.obsSeq=db.obsSeq||[];var x={ed:e,side:sd,at:new Date().toISOString().slice(0,10),cards:obsCards(hs)};
- if(db.obsSeq.some(function(y){return okey(y)===okey(x)})){note('同じ並びはすでに送信済みです。');return false}
- db.obsSeq.push(x);save();stockInfo();note('配列データに送信しました(推定)。');return true};
+ var H=typeof histories!=='undefined'?histories:null,sides=['left','right'].filter(function(s){return H&&H[s]&&H[s].length});
+ if(!sides.length){note('入力中のカードがありません。');return false}
+ db.obsSeq=db.obsSeq||[];var added=0;
+ sides.forEach(function(sd){var x={ed:e,side:sd,at:new Date().toISOString().slice(0,10),cards:obsCards(H[sd])};
+  if(db.obsSeq.some(function(y){return okey(y)===okey(x)}))return;db.obsSeq.push(x);added++});
+ if(!added){note('同じ並びはすでに送信済みです。');return false}
+ save();stockInfo();note('配列データに送信しました(推定)。');return true};
 function drawMatch(){var p=$('dbMatch');if(!p)return;p.innerHTML='';var e=selEd();if(!db.editions[e]||db.editions[e].locked)return;
  var H=typeof histories!=='undefined'?histories:null,sd=typeof currentSide!=='undefined'?currentSide:'right';if(!H)return;var hs=H[sd]||[];if(hs.length<3)return;
  db.obsSeq=db.obsSeq||[];var L=db.obsSeq.filter(function(x){return x.ed===e}),out=[];if(!L.length)return;

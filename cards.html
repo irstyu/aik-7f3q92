@@ -56,10 +56,11 @@ function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').repl
 var Q=document.getElementById('q'),RF=document.getElementById('rf'),TF=document.getElementById('tf'),ED=document.getElementById('ed'),SF=document.getElementById('sf'),G=document.getElementById('g'),CNT=document.getElementById('cnt'),OV=document.getElementById('ov'),MB=document.getElementById('menuBtn'),MO=document.getElementById('menuOv');
 function norm(s){return String(s).toLowerCase().replace(/[ァ-ヶ]/g,function(c){return String.fromCharCode(c.charCodeAt(0)-96)}).replace(/ /g,'').replace(/　/g,'')}
 function EO(c){return c.ed==='P'?1:0}
+function sw(el){el.classList.remove('swap');void el.offsetWidth;el.classList.add('swap')}
 function draw(){var q=norm(Q.value),f=RF.value,t=TF.value,e=ED.value,s=SF.value;
  var L=D.filter(function(c){return(!e||c.ed===e)&&(!f||c.r.indexOf(f)>=0)&&(!t||c.t===t)&&(VIEW==='a'||(VIEW==='p'?c.star:!c.star))&&(!q||(!isNaN(q)?String(c.id).indexOf(q)===0:(norm(c.name).indexOf(q)>=0||(c.no&&c.no.toLowerCase().indexOf(q)===0))))});
  L.sort(function(a,b){if(s==='no_d')return EO(b)-EO(a)||b.id-a.id||b.star-a.star;if(s==='ra_a')return RA[a.r[0]]-RA[b.r[0]]||a.id-b.id;if(s==='ra_d')return RD[a.r[0]]-RD[b.r[0]]||a.id-b.id;return EO(a)-EO(b)||a.id-b.id||a.star-b.star});
- CNT.innerHTML='見つかったカード <b>'+L.length+'</b> 枚';
+ sw(G);sw(CNT);CNT.innerHTML='見つかったカード <b>'+L.length+'</b> 枚';
  LB=L;G.innerHTML=L.map(function(c,i){return '<div class="c'+(c.t?' ty-'+c.t:'')+'" data-i="'+i+'">'+(c.img?'<div class="im'+(c.land?' land':'')+'"><img loading="lazy" src="'+c.img+'"></div>':'')+'<div><b>'+(c.no||c.id)+'</b>'+c.r.map(function(r){return '<span class="t '+r+'">'+SN[r]+'</span>'}).join('')+(c.t?'<span class="t ty '+c.t+'">'+TN[c.t]+'</span>':'')+'<br>'+esc(c.name)+'</div></div>'}).join('')}
 Q.oninput=draw;[RF,TF,ED,SF].forEach(function(x){x.onchange=draw});
 [].forEach.call(document.querySelectorAll('#vf button'),function(b){b.onclick=function(){VIEW=b.dataset.v;[].forEach.call(document.querySelectorAll('#vf button'),function(x){x.classList.toggle('on',x===b)});draw()}});

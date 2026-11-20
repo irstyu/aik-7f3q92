@@ -66,7 +66,7 @@ var as0=window.addSelected;window.addSelected=function(){var q=$('cardSearch').v
  br.onclick=function(){var dv=document.getElementById('dbView'),av=document.getElementById('arraysView');
   if(dv&&dv.classList.contains('active')&&window.dbShow){dbShow(false);window.scrollTo(0,0)}
   else if(av&&av.classList.contains('active')){backToSearch();window.scrollTo(0,0)}
-  else location.reload()}})();
+  else window.open(location.pathname,'_blank','noopener,noreferrer')}})();
 
 // ===== カードリスト(新しいタブ) =====
 var CSCSS='.cs{position:relative;display:block;width:100%;min-width:0}.cs-btn{display:flex;align-items:center;justify-content:space-between;gap:10px;width:100%;min-height:46px;padding:10px 14px;border:1px solid #d9dde8;background:#fff;border-radius:12px;font-size:15px;font-weight:600;color:#573647;text-align:left;font-family:inherit}.cs-btn span{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.caret{flex:none;width:8px;height:8px;border-right:2px solid #8a90a3;border-bottom:2px solid #8a90a3;transform:rotate(45deg);margin-top:-4px}.cs.open .caret{transform:rotate(-135deg);margin-top:3px}.cs.open .cs-btn,.cs-btn:active{border-color:#e85b91;box-shadow:0 0 0 2px rgba(232,91,145,.18)}.cs-list{display:none;position:absolute;left:0;right:0;top:calc(100% + 6px);z-index:400;background:#fff;border:1px solid #e85b91;border-radius:12px;box-shadow:0 10px 26px rgba(32,36,58,.18);max-height:52vh;overflow:auto;padding:4px;animation:fadeIn .18s ease}.cs.open .cs-list{display:block}.cs-item{display:block;width:100%;text-align:left;border:0;background:transparent;padding:12px;border-radius:9px;font-size:15px;color:#573647;font-family:inherit}.cs-item.on{background:#fff0f6;font-weight:800}@keyframes fadeIn{from{opacity:0}to{opacity:1}}';
@@ -149,7 +149,9 @@ var ti=window.toggleImages;window.toggleImages=function(){
  var els=document.querySelectorAll('#arrayDetail .slot'),best=null,bd=1e9,mid=window.innerHeight/2;
  [].forEach.call(els,function(el){var r=el.getBoundingClientRect(),d=Math.abs((r.top+r.bottom)/2-mid);if(d<bd){bd=d;best=el}});
  var before=best?best.getBoundingClientRect().top:0;ti.apply(this,arguments);
- if(best){var after=best.getBoundingClientRect().top;if(after!==before)window.scrollBy({top:after-before,behavior:'instant'})}};
+ var curEl=(typeof currentActiveSlotIndex!=='undefined'&&currentActiveSlotIndex>=0)?document.getElementById('slot-'+currentActiveSlotIndex):null;
+ if(curEl){curEl.scrollIntoView({block:'center',behavior:'instant'});setTimeout(function(){curEl.scrollIntoView({block:'center',behavior:'instant'})},330)}
+ else if(best){var after=best.getBoundingClientRect().top;if(after!==before)window.scrollBy({top:after-before,behavior:'instant'})}};
 (function(){
  var cb=$('showImageToggle'),lab=cb&&cb.closest('label'),KA='aikatsu_img_arr',KS='aikatsu_img_sug';
  if(lab)lab.style.display='none';
