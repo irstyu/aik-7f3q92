@@ -440,3 +440,9 @@ body.hide-images .slotlist .slot .slotnum{min-width:30px;width:30px;height:30px;
 /* 2026-11-21 本人実機確認の反映（にょろ直接編集）: パラレルへ＝紫、TOP＝白に入れ替え */
 #arrayFabContainer .fab-btn[onclick="jumpToParallel()"]{background:#efe6ff!important;color:#5b3d9a!important;border-color:#c9b4f0!important}
 #arrayFabContainer .fab-btn[onclick="scrollToTop()"]{background:#fff!important;color:#573647!important;border-color:#d9dde8!important}
+
+/* 2026-11-21 本人指定: ★/☆の目立ち方を逆転（まだ出ていない＝黄色で目立つ、出た＝グレーで目立たない）。記号の意味は不変 */
+.starbtn{background:#f3c942!important;color:#fff!important;border-color:#e0b020!important}
+.starbtn.on{background:#f7f8fa!important;color:#bfc5cf!important;border-color:#e2e5ec!important}
+.slbadge{background:#f7f8fa!important;color:#bfc5cf!important;border-color:#e2e5ec!important}
+.slbadge.on{background:#f3c942!important;color:#fff!important;border-color:#e0b020!important}
