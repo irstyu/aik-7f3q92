@@ -35,7 +35,13 @@ h1{display:block;width:max-content;max-width:78%;margin:24px auto 20px;padding:1
 .fld label{font-size:15px}.fld input{font-size:17px}.cs-btn{font-size:17px}.cs-item{font-size:17px}.seg button{font-size:15px}#moreBtn{font-size:17px}.sortrow>span{font-size:15px}
 footer{padding:14px;font-size:10.5px;color:#8a90a3;text-align:center;line-height:1.7}
 @media(min-width:700px){#g{grid-template-columns:repeat(6,1fr)}}
-</style></head><body class="sub">
+</style><style>/* 2026-11-21 本人指定: レアリティバッジを配列データ(.dbc .rr)と同色・同形に統一 */
+.t.N,.t.R,.t.PR,.t.ER,.t.PAR{min-width:26px;padding:0 6px;line-height:16px;text-align:center;font-weight:800}
+.t.N{background:#eef0f6;color:#ee3f8e}
+.t.R{background:#e9f1fb;color:#ee3f8e}
+.t.PR{background:#e0b020;color:#fff;text-shadow:0 0 3px rgba(32,36,58,.4)}
+.t.ER{background:#3fb2d4;color:#fff;text-shadow:0 0 3px rgba(32,36,58,.4)}
+.t.PAR{background:#ee3f8e;color:#fff;text-shadow:0 0 3px rgba(32,36,58,.4)}</style></head><body class="sub">
 <button id="homeFloat" type="button" title="配列サーチへ" onclick="location.href=BASE+'#search'"><svg viewBox="0 0 32 32" width="28" height="28"><rect x="5" y="3" width="14" height="19" rx="2.5" fill="#ffd3e5" stroke="#ee3f8e" stroke-width="2"/><circle cx="19" cy="19" r="6" fill="#fff" stroke="#ee3f8e" stroke-width="2.4"/><path d="M23.5 23.5L28 28" stroke="#ee3f8e" stroke-width="3" stroke-linecap="round"/></svg></button>
 <button id="backFloat" type="button" style="display:flex" onclick="goBack()"><i class="chev l"></i><span>BACK</span></button>
 <button id="menuBtn" type="button"><span class="bars"></span><span>MENU</span></button>

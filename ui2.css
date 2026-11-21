@@ -446,3 +446,6 @@ body.hide-images .slotlist .slot .slotnum{min-width:30px;width:30px;height:30px;
 .starbtn.on{background:#f7f8fa!important;color:#bfc5cf!important;border-color:#e2e5ec!important}
 .slbadge{background:#f7f8fa!important;color:#bfc5cf!important;border-color:#e2e5ec!important}
 .slbadge.on{background:#f3c942!important;color:#fff!important;border-color:#e0b020!important}
+
+/* 2026-11-21 本人指定: ドックの画像ボタンはOFF時も黄色にせず白にする */
+#arrayFabContainer #fabImg:not(.on){background:#fff!important;color:#573647!important;border-color:#d9dde8!important}
