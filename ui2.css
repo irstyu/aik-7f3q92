@@ -436,3 +436,7 @@ body.hide-images .slotlist .slot .slotnum{min-width:30px;width:30px;height:30px;
 .sdupwarn:not(:empty){margin-top:10px;padding:10px 12px;border-radius:12px;background:#fff7d6;border:1.5px solid #ecc95c;color:#6b4e00;font-size:.82rem}
 .sdupwarn p{margin:0 0 8px}
 .sdupwarn .srow2{display:flex;gap:8px;flex-wrap:wrap}
+
+/* 2026-11-21 本人実機確認の反映（にょろ直接編集）: パラレルへ＝紫、TOP＝白に入れ替え */
+#arrayFabContainer .fab-btn[onclick="jumpToParallel()"]{background:#efe6ff!important;color:#5b3d9a!important;border-color:#c9b4f0!important}
+#arrayFabContainer .fab-btn[onclick="scrollToTop()"]{background:#fff!important;color:#573647!important;border-color:#d9dde8!important}
