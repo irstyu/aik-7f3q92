@@ -150,7 +150,7 @@ var ti=window.toggleImages;window.toggleImages=function(){
  [].forEach.call(els,function(el){var r=el.getBoundingClientRect(),d=Math.abs((r.top+r.bottom)/2-mid);if(d<bd){bd=d;best=el}});
  var before=best?best.getBoundingClientRect().top:0;ti.apply(this,arguments);
  var curEl=(typeof currentActiveSlotIndex!=='undefined'&&currentActiveSlotIndex>=0)?document.getElementById('slot-'+currentActiveSlotIndex):null;
- if(curEl){curEl.scrollIntoView({block:'center',behavior:'instant'});setTimeout(function(){curEl.scrollIntoView({block:'center',behavior:'instant'})},330)}
+ if(curEl){void curEl.offsetHeight;curEl.scrollIntoView({block:'center',behavior:'instant'})}
  else if(best){var after=best.getBoundingClientRect().top;if(after!==before)window.scrollBy({top:after-before,behavior:'instant'})}};
 (function(){
  var cb=$('showImageToggle'),lab=cb&&cb.closest('label'),KA='aikatsu_img_arr',KS='aikatsu_img_sug';

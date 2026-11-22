@@ -449,3 +449,23 @@ body.hide-images .slotlist .slot .slotnum{min-width:30px;width:30px;height:30px;
 
 /* 2026-11-21 本人指定: ドックの画像ボタンはOFF時も黄色にせず白にする */
 #arrayFabContainer #fabImg:not(.on){background:#fff!important;color:#573647!important;border-color:#d9dde8!important}
+
+
+/* ===== v39 ===== */
+/* 第1部: 配列候補の3セクション(連続一致/順番一致/部分一致) */
+.sect{margin:16px 0}
+.secthead{display:flex;align-items:center;flex-wrap:wrap;gap:6px 10px;margin:6px 0 8px;padding:7px 12px;border-left:5px solid #ee3f8e;background:#fff;border-radius:0 12px 12px 0;box-shadow:0 2px 8px rgba(238,63,142,.08)}
+.secthead h3{margin:0;font-family:var(--hfont);font-size:1rem;color:#ee3f8e}
+.sectcnt{font-size:.78rem;color:#70778c;font-weight:700}
+.thctl{margin-left:auto;display:inline-flex;align-items:center;gap:6px;font-size:.78rem;color:#ee3f8e;font-weight:700}
+.thctl button{width:30px;height:30px;border-radius:50%;border:1.5px solid #ee3f8e;background:#fff;color:#ee3f8e;font-size:1.05rem;line-height:1;padding:0}
+.thctl b{min-width:60px;text-align:center}
+.sectnote{margin:0 4px 6px;font-size:.74rem;color:#70778c;line-height:1.5}
+.sectnone{padding:10px;border:1.5px dashed #f0a9c8;border-radius:12px;color:#70778c;font-size:.82rem;text-align:center;background:#fff}
+.missline{color:#9a5a00;font-weight:700}
+/* 第3部: 配列詳細の画像ON/OFFは、行の高さや位置が変わる動きを付けない(切り替えても現在位置が中央に留まる) */
+#arraysView{overflow-anchor:none}
+#arrayDetail,#arrayDetail *{overflow-anchor:none}
+#arrayDetail .cbox{transition:none!important}
+body.hide-images #arrayDetail .cbox{display:none!important}
+#arrayDetail .slot,#arrayDetail .slotin,#arrayDetail .slotopt,#arrayDetail .optbody,#arrayDetail .slotnum{transition:none!important}

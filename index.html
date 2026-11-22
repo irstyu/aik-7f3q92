@@ -256,7 +256,7 @@ body{background-color:#fff6fa!important;background-image:url("data:image/svg+xml
 </div>
 <div style="margin-top: 20px;">
   <div class="resulttitle"><h2>保存データ</h2><button class="mini danger" type="button" onclick="deleteAllHistories()">一括削除</button></div>
-  <div class="starlegend"><span class="slbadge">★</span>=パラレルが出た <span class="slbadge on">☆</span>=まだ出ていない<small>名前の左の★/☆をタップすると切り替わります</small></div>
+  <div class="starlegend"><span class="slbadge on">★</span>=パラレルがまだ出ていない(残っている) <span class="slbadge">☆</span>=パラレルが出た<small>入力内容から自動で判定します。名前の左の★/☆をタップすると手で切り替えられます(手で切り替えた記録は自動判定で変わりません)</small></div>
   <div id="savedListContainer" class="saved-data-list"></div>
 </div>
 
@@ -385,46 +385,134 @@ function jumpToParallel(){if(!currentActiveArray)return;const sl=arrays[currentA
 function jumpPar(no,last){viewArrayDetail(no,last);setTimeout(jumpToParallel,500)}
 function parQuick(){const b=document.getElementById('parQuickBody');if(!b)return;b.innerHTML=Object.keys(arrays).map(n=>{const p=parInfo(arrays[n]);return p?`<div class="pqrow"><span class="pqslot"><b>${p.n}</b>枠目</span><span class="pqname"><span class="pqno">No.${n}</span> PR★${esc(p.name)}${p.more?'<small>ほか'+p.more+'種</small>':''}</span></div>`:''}).join('')}
 
-function render(){
- const hist=histories[currentSide];$('sideTitle').textContent=currentSide==='right'?'右シリンダー':'左シリンダー';$('inputCount').textContent=hist.length+'枚入力済み';
- $('historyChips').innerHTML=hist.map((c,i)=>{const rr=c.star?'PAR':(rarOf[c.id+'|'+c.name+'|0']||c.rarity||'');return `<span class="chip"><span class="cn">${i+1}</span><span class="cname">${c.id}${c.name?':'+esc(c.name):''}</span>${rr?badge(rr):''}<button onclick="removeCard(${i})">×</button></span>`}).join('')||'<span class="note">まだカードが入力されていません。</span>';
- if(!hist.length){$('candidateCount').textContent='入力待ち';$('results').className='empty';$('results').textContent='カードを入力すると、候補配列と次の高レア枠を表示します。';return}
- const ranked=Object.entries(arrays).map(([no,slots])=>({no,slots,match:bestMatch(slots,hist)})).filter(x=>x.match).sort((a,b)=>a.match.gaps-b.match.gaps||Number(a.no)-Number(b.no));
- $('candidateCount').textContent=ranked.length+'件';
- if(!ranked.length){$('results').className='empty';$('results').textContent='一致する配列が見つかりません。カードの入力間違いがないか確認してね。';return}
- $('results').className='';
- $('results').innerHTML=ranked.map(x=>{
+// ---- 部分一致: 入力の順番を保ち、枠の間隔が足りる範囲で、いちばん多くのカードが合う並びを探す ----
+// 一致したカードどうしは、入力のあいだの枚数ぶん、枠が離れている必要がある(合わなかったカードは、間の枠のどれかに入る)
+function partialBest(slots,input){
+ const n=input.length,S=slots.length,c=[];
+ for(let j=0;j<n;j++)for(let p=0;p<S;p++){
+  if(p>=j&&S-1-p>=n-1-j&&matchSlot(slots[p],input[j]))c.push({j:j,p:p,cnt:1,gaps:0,prev:-1});
+ }
+ for(let k=0;k<c.length;k++){
+  for(let d=0;d<k;d++){
+   const x=c[d],y=c[k];
+   if(x.j<y.j&&x.p<y.p&&y.p-x.p>=y.j-x.j){
+    const cnt=x.cnt+1,gaps=x.gaps+((y.p-x.p-1)-(y.j-x.j-1));
+    if(cnt>y.cnt||(cnt===y.cnt&&gaps<y.gaps)){y.cnt=cnt;y.gaps=gaps;y.prev=d}
+   }
+  }
+ }
+ let best=null;
+ c.forEach(x=>{if(!best||x.cnt>best.cnt||(x.cnt===best.cnt&&(x.gaps<best.gaps||(x.gaps===best.gaps&&x.p<best.p))))best=x});
+ if(!best)return null;
+ const pos=[];let t=best;while(t){pos.unshift({j:t.j,p:t.p});t=t.prev>=0?c[t.prev]:null}
+ const lastM=pos[pos.length-1];
+ return{matched:best.cnt,gaps:best.gaps,pos:pos,last:lastM.p+(n-1-lastM.j)}
+}
+function partTh(){const v=parseInt(localStorage.getItem('aikatsu_part_th'),10);return(v>=30&&v<=90)?v:60}
+function setPartTh(d){const v=Math.min(90,Math.max(30,partTh()+d));try{localStorage.setItem('aikatsu_part_th',String(v))}catch(e){}render()}
+// 連続→順番→部分の順に判定し、1つの配列は最初に当てはまったセクションにだけ出す
+function classify(hist,th){
+ const cont=[],ord=[],part=[];
+ Object.entries(arrays).forEach(([no,slots])=>{
+  const bm=bestMatch(slots,hist);
+  if(bm){(bm.gaps===0?cont:ord).push({no:no,slots:slots,match:bm,kind:bm.gaps===0?'cont':'ord'});return}
+  const pm=partialBest(slots,hist);
+  if(pm&&pm.matched>=2&&pm.matched<hist.length&&pm.matched*100>=th*hist.length)part.push({no:no,slots:slots,match:{last:pm.last,gaps:pm.gaps},pm:pm,kind:'part'});
+ });
+ const byNo=(a,b)=>Number(a.no)-Number(b.no);
+ cont.sort(byNo);ord.sort((a,b)=>a.match.gaps-b.match.gaps||byNo(a,b));
+ part.sort((a,b)=>b.pm.matched-a.pm.matched||a.pm.gaps-b.pm.gaps||byNo(a,b));
+ return{cont:cont,ord:ord,part:part}
+}
+// 候補リストの一番上(連続→順番→部分の先頭)と、その配列でパラレル枠を通過したか
+function topCandidate(hist){
+ if(!hist||!hist.length)return null;
+ const c=classify(hist,partTh()),x=c.cont[0]||c.ord[0]||c.part[0];
+ if(!x)return null;
+ const pi=parInfo(x.slots);
+ return{no:x.no,last:x.match.last,passed:!!(pi&&pi.p<=x.match.last)}
+}
+function cardResultHtml(x,hist){
   const m=Object.assign({},x.match), ov=window.advOf?advOf(x.no):null; if(ov!==null)m.last=ov; const rr=nextRare(x.slots,m.last), pi=parInfo(x.slots);
   let parHtml='';
   if(pi){const passed=pi.p<=m.last, d=pi.p-m.last;
    parHtml=`<div class="parline"><div class="parrow"><span class="parbadge ${passed?'done':'todo'}">${passed?'パラレル通過済み('+pi.n+'枠目)':'パラレルまだ(あと'+d+'枚)'}</span><button type="button" class="parjump" onclick="event.stopPropagation();jumpPar('${x.no}',${m.last})">パラレルまでジャンプ</button></div><div class="parname">PR★${esc(pi.name)}${pi.more?` <button type="button" class="parmore" data-open="ほか${pi.more}種▾" data-close="ほか${pi.more}種▴" onclick="event.stopPropagation();toggleColl(this)">ほか${pi.more}種▾</button><div class="coll"><div class="colli"><div class="parnames">${pi.names.slice(1).map(n=>'PR★'+esc(n)).join('<br>')}</div></div></div>`:''}</div></div>`}
   const restHtml=rr.rest.length?`<button type="button" class="restbtn" data-open="続きを表示(${rr.rest.length}件)" data-close="たたむ" onclick="event.stopPropagation();toggleColl(this)">続きを表示(${rr.rest.length}件)</button><div class="coll"><div class="colli">${rr.rest.map(rareLineHtml).join('')}</div></div>`:'';
-  return `<div role="button" tabindex="0" class="cardresult${m.gaps===0?' cont':''}" onclick="viewArrayDetail('${x.no}', ${m.last})"><div class="crin">
-    <div class="rhead"><strong>No.${x.no}</strong><span class="matchtype ${m.gaps?'gap':''}">${m.gaps===0?' 連続一致':'順番一致・間に'+m.gaps+'枠'}</span></div>
-    <div class="meta">${hist.length}枚が一致 / 現在位置:${m.last+1}枠目</div>
+  let label,meta;
+  if(x.kind==='part'){
+   const pct=Math.round(x.pm.matched*100/hist.length), hit=new Set(x.pm.pos.map(q=>q.j));
+   const miss=hist.map((c,i)=>hit.has(i)?null:(i+1)+'枚目 '+c.id+(c.name?':'+esc(c.name):'')).filter(Boolean);
+   label='部分一致 '+pct+'%('+x.pm.matched+'/'+hist.length+'枚)';
+   meta=`${hist.length}枚中${x.pm.matched}枚が一致 / 現在位置(推定):${m.last+1}枠目<br><span class="missline">合わなかったカード: ${miss.join('、')}</span>`;
+  }else{
+   label=x.kind==='cont'?' 連続一致':'順番一致・間に'+x.match.gaps+'枠';
+   meta=`${hist.length}枚が一致 / 現在位置:${m.last+1}枠目`;
+  }
+  return `<div role="button" tabindex="0" class="cardresult${x.kind==='cont'?' cont':''}" onclick="viewArrayDetail('${x.no}', ${m.last})"><div class="crin">
+    <div class="rhead"><strong>No.${x.no}</strong><span class="matchtype ${x.kind==='cont'?'':'gap'}">${label}</span></div>
+    <div class="meta">${meta}</div>
     ${parHtml}
     <div class="tap-hint">タップでこの配列の現在位置&全カードを見る</div>
     <div class="rares"><b>この先の高レア枠</b>${rr.main.length?rr.main.map(rareLineHtml).join(''):'<div class="meta">この先に高レア枠はありません</div>'}${restHtml}</div>
   </div></div>`;
- }).join('');
 }
+function sectionHtml(cls,title,list,hist,extra,note){
+  return `<div class="sect sect-${cls}"><div class="secthead"><h3>${title}</h3><span class="sectcnt">${list.length}件</span>${extra||''}</div>${note?`<div class="sectnote">${note}</div>`:''}${list.length?list.map(x=>cardResultHtml(x,hist)).join(''):'<div class="sectnone">該当なし</div>'}</div>`;
+}
+
+function render(){
+ const hist=histories[currentSide];$('sideTitle').textContent=currentSide==='right'?'右シリンダー':'左シリンダー';$('inputCount').textContent=hist.length+'枚入力済み';
+ $('historyChips').innerHTML=hist.map((c,i)=>{const rr=c.star?'PAR':(rarOf[c.id+'|'+c.name+'|0']||c.rarity||'');return `<span class="chip"><span class="cn">${i+1}</span><span class="cname">${c.id}${c.name?':'+esc(c.name):''}</span>${rr?badge(rr):''}<button onclick="removeCard(${i})">×</button></span>`}).join('')||'<span class="note">まだカードが入力されていません。</span>';
+ if(!hist.length){$('candidateCount').textContent='入力待ち';$('results').className='empty';$('results').textContent='カードを入力すると、候補配列と次の高レア枠を表示します。';return}
+ const th=partTh(), c=classify(hist,th), total=c.cont.length+c.ord.length+c.part.length;
+ $('candidateCount').textContent=total+'件';
+ $('results').className='';
+ const ctl=`<span class="thctl" onclick="event.stopPropagation()"><span>一致率</span><button type="button" onclick="event.stopPropagation();setPartTh(-10)" aria-label="しきい値を下げる">−</button><b>${th}%以上</b><button type="button" onclick="event.stopPropagation();setPartTh(10)" aria-label="しきい値を上げる">＋</button></span>`;
+ $('results').innerHTML=(total?'':'<div class="empty" style="margin-bottom:10px">一致する配列が見つかりません。カードの入力間違いがないか確認してね。</div>')+
+  sectionHtml('cont','連続一致の配列',c.cont,hist,'','入力した順番どおりに、間を空けずに並んでいる配列です。')+
+  sectionHtml('ord','順番一致の配列',c.ord,hist,'','間を飛ばしていても、カードの順番が一致している配列です。')+
+  sectionHtml('part','部分一致の配列',c.part,hist,ctl,'登録された枠にないカードが混ざっていても、順番が保たれていて、一致率がしきい値以上の配列です(2枚以上一致)。');
+}
+
 
 
 // === 保存・読み込み機能 ===
 const STORAGE_KEY = 'aikatsu_array_saved_histories';
 function cloneArr(x){return JSON.parse(JSON.stringify(x||[]))}
 function cardSig(arr){return (arr||[]).map(c=>c.id+':'+(c.star?1:0)).join(',')}
-function readSaved(){return JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]')}
+// ★=パラレルがまだ(残っている)、☆=パラレルが出た。内部の star は「出た」=true(意味は変えない)。
+// v38以前に保存したデータは、名前の末尾の記号が旧ルール(★=出た/☆=まだ)なので、読み込み時に内部状態へ直して新ルールの記号に書き換える
+function readSaved(){
+  const a=JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');let dirty=false;
+  a.forEach(it=>{
+    if(it.sv===2)return;
+    let st;
+    if(it.star!==undefined)st=!!it.star;
+    else if(/★$/.test(it.name||''))st=true;
+    else if(/☆$/.test(it.name||''))st=false;
+    else{const s=itemSides(it);st=s.left.concat(s.right).some(c=>c.star)}
+    it.star=st;
+    if(/[★☆]$/.test(it.name||''))it.name=it.name.replace(/[★☆]$/,st?'☆':'★');
+    it.sv=2;dirty=true;
+  });
+  if(dirty){try{localStorage.setItem(STORAGE_KEY,JSON.stringify(a))}catch(e){}}
+  return a;
+}
 function writeSaved(a){localStorage.setItem(STORAGE_KEY, JSON.stringify(a))}
 function isSet(item){return Array.isArray(item.left)||Array.isArray(item.right)}
 function itemSides(item){
   if(isSet(item))return {left:item.left||[],right:item.right||[]};
   return {left:item.side==='left'?(item.data||[]):[],right:item.side==='right'?(item.data||[]):[]};
 }
+// 左右それぞれ、候補リストの一番上の配列でパラレル枠を通過していれば「出た」。判定できる側がすべて「出た」のときだけ記録全体が「出た」
+function autoStar(sd){
+  const sides=[sd.left,sd.right].filter(a=>a&&a.length);
+  if(!sides.length)return false;
+  return sides.every(h=>{const t=topCandidate(h);return !!(t&&t.passed)});
+}
 function itemStar(item){
-  if(item.star!==undefined)return !!item.star;
-  const s=itemSides(item);
-  return /★$/.test(item.name||'')||s.left.concat(s.right).some(c=>c.star);
+  if(item.starAuto && !item.starManual){try{return autoStar(itemSides(item))}catch(e){return !!item.star}}
+  return !!item.star;
 }
 
 // 左右同時に保存(1件に左右の両方を入れる)
@@ -436,12 +524,12 @@ function saveCurrentHistory() {
   }
   const d=new Date(), sr=(window.sessRaw?sessRaw():{shop:'',unit:'',label:''});
   const part=[]; if(L.length)part.push('左'+L.length+'枚'); if(R.length)part.push('右'+R.length+'枚');
-  const star=L.concat(R).some(c=>c.star);
-  const defName=(d.getMonth()+1)+'/'+d.getDate()+' '+(sr.label?sr.label+' ':'')+'('+part.join('・')+')'+(star?'★':'☆');
-  const name = prompt('保存する名前を入力してください(自動で付けた名前を変えられます。★=パラレルが出た ☆=まだ。左右とも保存されます)', defName);
+  const star=autoStar({left:L,right:R});
+  const defName=(d.getMonth()+1)+'/'+d.getDate()+' '+(sr.label?sr.label+' ':'')+'('+part.join('・')+')'+(star?'☆':'★');
+  const name = prompt('保存する名前を入力してください(自動で付けた名前を変えられます。★=パラレルがまだ ☆=パラレルが出た。左右とも保存されます)', defName);
   if (!name) return;
   const saved = readSaved();
-  saved.push({ name: name, side: currentSide, data: cloneArr(histories[currentSide]), left: cloneArr(L), right: cloneArr(R), star: star, sess: sr.label, shop: sr.shop, unit: sr.unit });
+  saved.push({ name: name, side: currentSide, data: cloneArr(histories[currentSide]), left: cloneArr(L), right: cloneArr(R), star: star, starAuto: true, sv: 2, sess: sr.label, shop: sr.shop, unit: sr.unit });
   writeSaved(saved);
   alert('保存しました！');
   renderSavedList();
@@ -486,8 +574,8 @@ function toggleSavedStar(idx){
   const saved = readSaved();
   const item = saved[idx]; if(!item) return;
   const now = !itemStar(item);
-  item.star = now;
-  if(/[★☆]$/.test(item.name||'')) item.name = item.name.replace(/[★☆]$/, now?'★':'☆');
+  item.star = now; item.starManual = true; item.starAuto = false;
+  if(/[★☆]$/.test(item.name||'')) item.name = item.name.replace(/[★☆]$/, now?'☆':'★');
   writeSaved(saved);
   renderSavedList();
 }
@@ -506,7 +594,7 @@ function renderSavedList() {
     const meta = set ? ['左'+sd.left.length+'枚','右'+sd.right.length+'枚'].filter((t,i)=>(i?sd.right:sd.left).length).join('・') : (item.side==='right'?'右':'左')+'シリンダー / '+(item.data||[]).length+'枚';
     return `
     <div class="saved-item${idx===last?' is-new':''}" data-i="${idx}">
-      <button type="button" class="starbtn${st?' on':''}" onclick="toggleSavedStar(${idx})" title="タップで★/☆を切り替え">${st?'★':'☆'}</button>
+      <button type="button" class="starbtn${st?' on':''}" onclick="toggleSavedStar(${idx})" title="タップで★/☆を切り替え">${st?'☆':'★'}</button>
       <div class="sinfo">
         <strong onclick="renameHistory(${idx})" style="cursor:pointer" title="タップで名前を変更"><span class="saved-no">${idx+1}</span>${esc(item.name)}${idx===last?'<span class="new-tag">NEW</span>':''}</strong>
         <div class="meta">${meta}${item.ed?' / 第'+item.ed+'弾':''}</div>
