@@ -472,3 +472,5 @@ body.hide-images #arrayDetail .cbox{display:none!important}
 
 /* v40: 保存名の末尾の★/☆は行頭に */
 .saved-item .nstar{display:inline-block;margin-top:2px;font-size:1.05em}
+
+.saved-item .ncount{white-space:nowrap}

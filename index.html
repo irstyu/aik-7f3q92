@@ -575,7 +575,7 @@ function toggleSavedStar(idx){
 }
 
 // 保存名の表示だけ、末尾の★/☆を行頭に回す(割れ方が見苦しいため)。保存される文字列は変えない
-function nameHtml(nm){nm=nm||'';const m=/^([\s\S]*?)\s*([★☆])$/.exec(nm);return m?esc(m[1])+'<br><span class="nstar">'+m[2]+'</span>':esc(nm)}
+function nameHtml(nm){nm=nm||'';const m=/^([\s\S]*?)\s*([★☆])$/.exec(nm);if(!m)return esc(nm);const h=esc(m[1]).replace(/（左[^）]*）/,'<span class="ncount">$&</span>');return h+'<br><span class="nstar">'+m[2]+'</span>'}
 
 function renderSavedList() {
   const saved = readSaved();
