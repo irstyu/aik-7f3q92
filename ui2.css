@@ -469,3 +469,6 @@ body.hide-images .slotlist .slot .slotnum{min-width:30px;width:30px;height:30px;
 #arrayDetail .cbox{transition:none!important}
 body.hide-images #arrayDetail .cbox{display:none!important}
 #arrayDetail .slot,#arrayDetail .slotin,#arrayDetail .slotopt,#arrayDetail .optbody,#arrayDetail .slotnum{transition:none!important}
+
+/* v40: 保存名の末尾の★/☆は行頭に */
+.saved-item .nstar{display:inline-block;margin-top:2px;font-size:1.05em}
