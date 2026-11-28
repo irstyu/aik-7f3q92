@@ -256,7 +256,7 @@ body{background-color:#fff6fa!important;background-image:url("data:image/svg+xml
 </div>
 <div style="margin-top: 20px;">
   <div class="resulttitle"><h2>保存データ</h2><button class="mini danger" type="button" onclick="deleteAllHistories()">一括削除</button></div>
-  <div class="starlegend"><span class="slbadge on">★</span>=パラレルがまだ出ていない(残っている) <span class="slbadge">☆</span>=パラレルが出た<small>入力内容から自動で判定します。名前の左の★/☆をタップすると手で切り替えられます(手で切り替えた記録は自動判定で変わりません)</small></div>
+  <div class="starlegend"><span class="slitem"><span class="slbadge on">★</span>=パラレルがまだ出ていない(残っている)</span><span class="slitem"><span class="slbadge">☆</span>=パラレルが出た</span><small>入力内容から自動で判定します。名前の左の★/☆をタップすると手で切り替えられます(手で切り替えた記録は自動判定で変わりません)</small></div>
   <div id="savedListContainer" class="saved-data-list"></div>
 </div>
 
@@ -574,9 +574,6 @@ function toggleSavedStar(idx){
   renderSavedList();
 }
 
-// 保存名の表示だけ、末尾の★/☆を行頭に回す(割れ方が見苦しいため)。保存される文字列は変えない
-function nameHtml(nm){nm=nm||'';const m=/^([\s\S]*?)\s*([★☆])$/.exec(nm);if(!m)return esc(nm);const h=esc(m[1]).replace(/（左[^）]*）/,'<span class="ncount">$&</span>');return h+'<br><span class="nstar">'+m[2]+'</span>'}
-
 function renderSavedList() {
   const saved = readSaved();
   const container = document.getElementById('savedListContainer');
@@ -593,7 +590,7 @@ function renderSavedList() {
     <div class="saved-item${idx===last?' is-new':''}" data-i="${idx}">
       <button type="button" class="starbtn${st?' on':''}" onclick="toggleSavedStar(${idx})" title="タップで★/☆を切り替え">${st?'☆':'★'}</button>
       <div class="sinfo">
-        <strong onclick="renameHistory(${idx})" style="cursor:pointer" title="タップで名前を変更"><span class="saved-no">${idx+1}</span>${nameHtml(item.name)}${idx===last?'<span class="new-tag">NEW</span>':''}</strong>
+        <strong onclick="renameHistory(${idx})" style="cursor:pointer" title="タップで名前を変更"><span class="saved-no">${idx+1}</span>${esc(item.name)}${idx===last?'<span class="new-tag">NEW</span>':''}</strong>
         <div class="meta">${meta}${item.ed?' / 第'+item.ed+'弾':''}</div>
       </div>
       <div class="saved-item-actions">
